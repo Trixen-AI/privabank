@@ -1,0 +1,189 @@
+/* PrivaBank design tokens.
+   Role structure mirrors the reference layout system (scale, spacing, radii,
+   shadows, easing); every value is PrivaBank's own. Accent is "authorization
+   jade": the colour of permission granted. */
+
+:root {
+  /* Brand ramp */
+  --jade-50: #e6fff6;
+  --jade-100: #c2fbe8;
+  --jade-200: #8bf2d0;
+  --jade-300: #4ee3b4;
+  --jade-400: #20cd99;
+  --jade-500: #0fae80;
+  --jade-600: #0b8a66;
+  --jade-700: #086a4f;
+  --jade-800: #054b39;
+  --jade-900: #032e23;
+
+  --primary: #0b8a66;
+  --primary-hover: #0a7857;
+  --primary-press: #086a4f;
+  --primary-tint: #e6fff6;
+
+  /* Ink ramp (cool neutral) */
+  --black: #000000;
+  --ink-900: #07090a;
+  --ink-800: #0e1113;
+  --ink-700: #161a1c;
+  --ink-600: #222729;
+  --ink-500: #363c3f;
+  --ink-400: #525a5d;
+  --ink-300: #7d878a;
+  --ink-200: #b0b8ba;
+  --ink-100: #dcdedd;
+  --ink-050: #f1f3f2;
+  --white: #ffffff;
+
+  /* Surfaces */
+  --bg: #ffffff;
+  --bg-raised: #f7f8f8;
+  --bg-subtle: #f1f3f2;
+  --bg-card: #ffffff;
+
+  /* Foreground */
+  --fg1: #07090a;
+  --fg2: #525a5d;
+  --fg3: #7d878a;
+  --border: #dcdedd;
+  --border-faint: rgba(0, 0, 0, 0.08);
+
+  /* Accent roles */
+  --accent: #0b8a66;
+  --accent-soft: rgba(11, 138, 102, 0.1);
+  --accent-tint: #e6fff6;
+  --on-accent: #ffffff;
+  --anthracite: #161a1c;
+
+  /* Inverted surface */
+  --invert-bg: #07090a;
+  --invert-bg-raised: #0e1113;
+  --invert-bg-card: #161a1c;
+  --invert-fg1: #ffffff;
+  --invert-fg2: #b0b8ba;
+  --invert-fg3: #7d878a;
+  --invert-border: rgba(255, 255, 255, 0.1);
+
+  /* Status */
+  --success: #0fae80;
+  --warning: #c9760a;
+  --danger: #d83a3a;
+  --info: #0a7857;
+
+  /* Category surfaces */
+  --cat-vault-bg-1: #f6faf8;
+  --cat-vault-bg-2: #e8f1ed;
+  --cat-dark-bg: #07090a;
+
+  /* Type */
+  --font-sans: "General Sans", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-serif: "Newsreader", Georgia, "Times New Roman", serif;
+
+  --text-display: 88px;
+  --text-h1: 56px;
+  --text-h2: 40px;
+  --text-h3: 28px;
+  --text-h4: 22px;
+  --text-lg: 18px;
+  --text-body: 16px;
+  --text-sm: 14px;
+  --text-xs: 12px;
+  --text-mono: 13px;
+
+  --lh-tight: 1.02;
+  --lh-snug: 1.12;
+  --lh-normal: 1.5;
+  --lh-loose: 1.65;
+
+  --tracking-display: -0.02em;
+  --tracking-head: -0.01em;
+  --tracking-body: 0em;
+  --tracking-mono: 0.22em;
+
+  /* Space */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  /* Radii */
+  --radius-none: 0px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 22px;
+  --radius-pill: 999px;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px rgba(7, 16, 13, 0.06);
+  --shadow-md: 0 8px 24px rgba(7, 16, 13, 0.1);
+  --shadow-lg: 0 24px 64px rgba(7, 16, 13, 0.14);
+  --glow-jade: 0 0 0 1px rgba(15, 174, 128, 0.4), 0 0 40px rgba(15, 174, 128, 0.3);
+  --glow-jade-soft: 0 10px 40px rgba(15, 174, 128, 0.2);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 140ms;
+  --dur: 240ms;
+  --dur-slow: 520ms;
+}
+
+/* Display scale classes */
+.ds-display {
+  font-size: var(--text-display);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-display);
+  font-weight: 400;
+}
+.ds-h1 {
+  font-size: var(--text-h1);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-display);
+  font-weight: 400;
+}
+.ds-h2 {
+  font-size: var(--text-h2);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-head);
+  font-weight: 400;
+}
+.ds-h3 {
+  font-size: var(--text-h3);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-head);
+  font-weight: 400;
+}
+.ds-h4 {
+  font-size: var(--text-h4);
+  line-height: 1.25;
+  letter-spacing: var(--tracking-head);
+  font-weight: 500;
+}
+.ds-body {
+  font-size: var(--text-body);
+  line-height: var(--lh-normal);
+}
+.ds-lg {
+  font-size: var(--text-lg);
+  line-height: var(--lh-normal);
+}
+.ds-sm {
+  font-size: var(--text-sm);
+  line-height: var(--lh-normal);
+}
+.ds-label,
+.ds-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+  font-weight: 400;
+}
