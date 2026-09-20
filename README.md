@@ -52,7 +52,7 @@ Protocol pieces that need infrastructure: payments settle **from the user's wall
 - **Newsletter.** The footer form only validates the address and shows a message. It is not connected to a mailing list provider yet.
 - **Figures.** Network stats, counters, token figures and relayer numbers are illustrative placeholders, not live data.
 - **Links.** Info links point to anchors on the landing page; product actions (Log in, Sign up, Get credentials, Buy $PRIVA) open the dashboard.
-- **Hosting.** Deployed on Vercel at https://privabank.money. `vercel.json` rewrites unknown paths to `index.html` so `/app/*` routes survive a refresh; `robots.txt` keeps `/app` out of search.
+- **Hosting.** Deployed on Vercel at https://privahub.money. `vercel.json` rewrites unknown paths to `index.html` so `/app/*` routes survive a refresh; `robots.txt` keeps `/app` out of search.
 
 ## Third-party marks
 

@@ -114,7 +114,7 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" vi
   <text x="96" y="340" font-family="General Sans" font-weight="600" font-size="92" letter-spacing="-2" fill="#ffffff">Privacy as</text>
   <text x="96" y="440" font-family="General Sans" font-weight="600" font-size="92" letter-spacing="-2" fill="#c2fbe8">Infrastructure.</text>
   <text x="100" y="520" font-family="General Sans" font-weight="600" font-size="30" fill="#ffffff" fill-opacity="0.82">The authorization-based onchain neobank.</text>
-  <text x="1104" y="566" text-anchor="end" font-family="General Sans" font-weight="600" font-size="24" letter-spacing="1" fill="#ffffff" fill-opacity="0.7">privabank.money</text>
+  <text x="1104" y="566" text-anchor="end" font-family="General Sans" font-weight="600" font-size="24" letter-spacing="1" fill="#ffffff" fill-opacity="0.7">privahub.money</text>
 </svg>`;
 void ogVbW;
 renderAt(og, "og-image.png", 1200, { font: { fontFiles: ["scripts/fonts/GeneralSans-600.ttf"], loadSystemFonts: false, defaultFontFamily: "General Sans" } });

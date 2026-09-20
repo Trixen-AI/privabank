@@ -32,7 +32,7 @@ createAppKit({
   metadata: {
     name: "PrivaBank",
     description: "Privacy-first, authorization-based onchain neobank.",
-    url: typeof window !== "undefined" ? window.location.origin : "https://privabank.app",
+    url: typeof window !== "undefined" ? window.location.origin : "https://privahub.money",
     icons: [typeof window !== "undefined" ? `${window.location.origin}/brand/logo-500.png` : ""],
   },
   features: {
