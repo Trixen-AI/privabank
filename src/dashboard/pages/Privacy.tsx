@@ -30,7 +30,7 @@ export default function Privacy() {
     <>
       <PageHeader
         eyebrow="Privacy & control"
-        title="Exposure report"
+        title={<>Exposure <em>report.</em></>}
         sub={`What anyone can learn about ${shortAddr(w.address)} from ${chain.name}'s public ledger, without asking you.`}
         actions={
           <button type="button" className="btn btn-sec" onClick={refresh} disabled={loading}>
@@ -148,7 +148,7 @@ export default function Privacy() {
             )}
           </Card>
 
-          <Card label="With PrivaBank" title="How authorization-based banking changes this">
+          <Card label="With CassaFi" title="How authorization-based banking changes this">
             <ul className="compare">
               <li>
                 <span className="compare-k">Balance</span>

@@ -25,7 +25,7 @@ const NETWORK: Record<CardNetwork, { svg?: string; src?: string; label: string }
 };
 
 /**
- * The PrivaBank card: front with number, holder and expiry; back with the
+ * The CassaFi card: front with number, holder and expiry; back with the
  * signature strip and CVV. Number and CVV stay masked until the holder
  * reveals them, the way a banking app shows card details.
  */
@@ -96,7 +96,7 @@ export function BankCard({
             </span>
           </div>
           <p className="bcard-fine">
-            Issued by PrivaBank Protocol against your spending credential. Payments made with this card are authorized by
+            Issued by CassaFi Labs against your spending credential. Payments made with this card are authorized by
             credential and settle in stablecoins.
           </p>
           <span className="bcard-back-brand">

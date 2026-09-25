@@ -1,7 +1,7 @@
 import type { Address } from "viem";
 
 /**
- * Networks PrivaBank runs on, with the data sources the dashboard reads for each.
+ * Networks CassaFi runs on, with the data sources the dashboard reads for each.
  *
  * Chain ID and RPC were checked against the live endpoint (eth_chainId):
  *   Robinhood Chain  4663  rpc.mainnet.chain.robinhood.com

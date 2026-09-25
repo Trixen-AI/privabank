@@ -220,7 +220,7 @@ export default function Pay() {
   if (!data.credential) {
     return (
       <>
-        <PageHeader eyebrow="Banking" title="Authorize a payment" />
+        <PageHeader eyebrow="Banking" title={<>Authorize a <em>payment.</em></>} />
         <Card>
           <Empty
             icon={<BadgeCheck size={22} />}
@@ -231,7 +231,7 @@ export default function Pay() {
               </Link>
             }
           >
-            Every PrivaBank payment is authorized with your credential. Issuing it takes one signature and doesn't move funds.
+            Every CassaFi payment is authorized with your credential. Issuing it takes one signature and doesn't move funds.
           </Empty>
         </Card>
       </>
@@ -241,7 +241,7 @@ export default function Pay() {
   if (phase !== "form" && current) {
     return (
       <>
-        <PageHeader eyebrow="Banking" title="Authorize a payment" />
+        <PageHeader eyebrow="Banking" title={<>Authorize a <em>payment.</em></>} />
         <PayProgress phase={phase} auth={current} error={error} onReset={reset} onRetry={() => settle(current, "wallet")} />
       </>
     );
@@ -251,7 +251,7 @@ export default function Pay() {
     <>
       <PageHeader
         eyebrow="Banking"
-        title="Authorize a payment"
+        title={<>Authorize a <em>payment.</em></>}
         sub={`You sign an authorization with your credential. It is checked against your spending rules before anything leaves ${chain.short}.`}
       />
 

@@ -1,0 +1,35 @@
+# What EAS Build uploads (read by eas-cli from the repository root).
+# While this file exists, EAS ignores every .gitignore, so all ignore rules live here.
+#
+# Only the mobile app is uploaded. The website (src/, public/, the root .env,
+# scripts/, etc.) stays on this machine.
+/*
+!/mobile
+
+# Installed or generated on the build server, never uploaded
+/mobile/node_modules
+/mobile/.expo
+/mobile/dist
+/mobile/web-build
+/mobile/ios
+/mobile/android
+/mobile/expo-env.d.ts
+/mobile/.kotlin
+/mobile/.metro-health-check*
+/mobile/*.tsbuildinfo
+/mobile/npm-debug.*
+
+# Signing material must never be uploaded as plain files
+/mobile/*.jks
+/mobile/*.p8
+/mobile/*.p12
+/mobile/*.key
+/mobile/*.mobileprovision
+/mobile/*.pem
+
+# mobile/.env IS uploaded on purpose: it only holds EXPO_PUBLIC_REOWN_PROJECT_ID,
+# a public value that ends up inside the app anyway. It stays out of git.
+
+# Editor settings, not part of the app
+/mobile/.claude
+/mobile/.vscode

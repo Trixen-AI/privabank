@@ -1,3 +1,3 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <path d="M19 10H36A14 14 0 0 1 36 38H26V49A5 5 0 0 1 21 54H19A5 5 0 0 1 14 49V15A5 5 0 0 1 19 10Z M40.1 25.59A4.6 4.6 0 1 0 35.9 25.59L36.5 32.5H39.5Z" fill-rule="evenodd" clip-rule="evenodd" fill="#0b8a66"/>
-  <rect x="34" y="43" width="14" height="11" rx="3.5" fill="#20cd99"/></svg>
+  <path d="M47 14H27A13 13 0 0 0 14 27V37A13 13 0 0 0 27 50H47" fill="none" stroke="#0b8a66" stroke-width="12" stroke-linecap="round"/>
+  <rect x="33" y="25" width="14" height="14" rx="4" fill="#20cd99"/></svg>

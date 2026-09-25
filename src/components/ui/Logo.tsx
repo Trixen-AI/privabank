@@ -1,43 +1,42 @@
 import { WORDMARK_PATH_A, WORDMARK_PATH_B, WORDMARK_VIEWBOX } from "./wordmark";
 
 /**
- * PrivaBank logomark.
+ * CassaFi logomark.
  *
- * Concept: a solid "P" whose counter is cut as a keyhole, with a small chip set
- * apart below the bowl. The P is the account, solid because nobody outside can
- * read it. The keyhole is the permission to spend: PrivaBank authorizes, it does
- * not expose ownership. The chip is the payment, detached from the letter with
- * no line joining them, the way a PrivaBank payment leaves no link back to the
- * account that made it.
+ * Concept: "cassa" is the till, the strongbox a shop keeps its takings in. The
+ * mark is that box drawn as a C: a thick, soft-cornered frame open on one side,
+ * with a single solid note held inside it. The note has no number and no label
+ * on it, the way a CassaFi balance is held without being readable from outside.
+ * The open side is the permission to spend: money leaves by authorization, not
+ * by someone reaching in.
  *
- * Geometry sits on a 64 grid with 5px corner radii to match the UI's rounded,
- * solid shape language. No strokes, so it holds up as a 16px favicon.
- * scripts/export-brand.mjs and the dot matrix in viz/Scenes.tsx reuse these
- * coordinates; change all three together.
+ * Geometry sits on a 64 grid. The frame is a 12-unit round-capped stroke whose
+ * corners bend on a 13-unit radius, matching the site's pill and soft-card shape
+ * language, and the note is a 4-unit-radius square. It holds up as a 16px
+ * favicon. scripts/export-brand.mjs repeats these values; change both together.
  */
-const MARK_P =
-  "M19 10H36A14 14 0 0 1 36 38H26V49A5 5 0 0 1 21 54H19A5 5 0 0 1 14 49V15A5 5 0 0 1 19 10Z";
-// Keyhole: one continuous subpath (bowl + tapered slot). Two overlapping
-// subpaths would flip back to solid under the even-odd fill rule.
-const MARK_KEYHOLE = "M40.1 25.59A4.6 4.6 0 1 0 35.9 25.59L36.5 32.5H39.5Z";
-const MARK_CHIP = { x: 34, y: 43, w: 14, h: 11, r: 3.5 };
+const MARK_FRAME = "M47 14H27A13 13 0 0 0 14 27V37A13 13 0 0 0 27 50H47";
+const MARK_FRAME_WIDTH = 12;
+const MARK_NOTE = { x: 33, y: 25, w: 14, h: 14, r: 4 };
 
 export function Logomark({ inverted = false, className = "logomark" }: { inverted?: boolean; className?: string }) {
   return (
     <svg className={className} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path
-        d={`${MARK_P} ${MARK_KEYHOLE}`}
-        fillRule="evenodd"
-        clipRule="evenodd"
-        fill={inverted ? "var(--jade-400)" : "var(--accent)"}
+        className="lm-frame"
+        d={MARK_FRAME}
+        stroke={inverted ? "var(--jade-300)" : "var(--accent)"}
+        strokeWidth={MARK_FRAME_WIDTH}
+        strokeLinecap="round"
       />
       <rect
-        x={MARK_CHIP.x}
-        y={MARK_CHIP.y}
-        width={MARK_CHIP.w}
-        height={MARK_CHIP.h}
-        rx={MARK_CHIP.r}
-        fill={inverted ? "var(--jade-200)" : "var(--jade-400)"}
+        className="lm-note"
+        x={MARK_NOTE.x}
+        y={MARK_NOTE.y}
+        width={MARK_NOTE.w}
+        height={MARK_NOTE.h}
+        rx={MARK_NOTE.r}
+        fill="var(--jade-100)"
       />
     </svg>
   );
@@ -45,7 +44,7 @@ export function Logomark({ inverted = false, className = "logomark" }: { inverte
 
 export function Wordmark({ className = "wordmark" }: { className?: string }) {
   return (
-    <svg className={className} viewBox={WORDMARK_VIEWBOX} xmlns="http://www.w3.org/2000/svg" aria-label="PrivaBank">
+    <svg className={className} viewBox={WORDMARK_VIEWBOX} xmlns="http://www.w3.org/2000/svg" aria-label="CassaFi">
       <path className="wm-a" d={WORDMARK_PATH_A} />
       <path className="wm-b" d={WORDMARK_PATH_B} />
     </svg>

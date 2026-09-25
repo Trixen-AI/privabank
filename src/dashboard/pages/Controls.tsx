@@ -35,7 +35,7 @@ export default function Controls() {
     <>
       <PageHeader
         eyebrow="Privacy & control"
-        title="Spending controls"
+        title={<>Spending <em>controls.</em></>}
         sub="The rules your credential enforces before it signs anything, and the reports that prove it to an auditor."
       />
       <div className="controls-grid">
@@ -295,7 +295,7 @@ function Reports({ data, chainId, address }: { data: WalletData; chainId: number
         signature,
         file: text,
       });
-      download(`privabank-audit-${fmtDay(from).replace(/[ ,]+/g, "-")}-to-${fmtDay(to).replace(/[ ,]+/g, "-")}.json`, text, "application/json");
+      download(`cassafi-audit-${fmtDay(from).replace(/[ ,]+/g, "-")}-to-${fmtDay(to).replace(/[ ,]+/g, "-")}.json`, text, "application/json");
       toast({ tone: "ok", title: "Audit report signed", body: `${report.authorizations.length + report.settlements.length} entries, downloaded as JSON.` });
     } catch (e) {
       setErr(humanError(e));
@@ -341,7 +341,7 @@ function Reports({ data, chainId, address }: { data: WalletData; chainId: number
                 className="icon-btn"
                 aria-label="Download report"
                 title="Download"
-                onClick={() => download(`privabank-audit-${r.id}.json`, r.file, "application/json")}
+                onClick={() => download(`cassafi-audit-${r.id}.json`, r.file, "application/json")}
               >
                 <Download size={15} />
               </button>
@@ -368,7 +368,7 @@ function VerifyReport() {
     setBusy(true);
     try {
       const parsed = JSON.parse(await file.text()) as SignedAuditFile;
-      if (parsed?.report?.schema !== "privabank.audit/1" || !parsed.signature) throw new Error("This isn't a PrivaBank audit report.");
+      if (parsed?.report?.schema !== "cassafi.audit/1" || !parsed.signature) throw new Error("This isn't a CassaFi audit report.");
       const v = await verifyAuditFile(parsed);
       setResult({ ...v, name: file.name, entries: parsed.report.authorizations.length + parsed.report.settlements.length });
     } catch (e) {

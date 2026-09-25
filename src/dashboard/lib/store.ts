@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 import type { Address, Hex } from "viem";
 
 /**
- * Everything PrivaBank keeps on this device, per wallet address.
+ * Everything CassaFi keeps on this device, per wallet address.
  *
  * Only public material is stored: the credential ID and commitment (never the
  * signature they were derived from), spending policy, the authorizations the
@@ -21,7 +21,7 @@ export type Credential = {
   method: string;
   /** false when the wallet signs non-deterministically (smart accounts, some embedded wallets). */
   deterministic: boolean | null;
-  /** Name printed on the PrivaBank card. Older credentials may not have one yet. */
+  /** Name printed on the CassaFi card. Older credentials may not have one yet. */
   holderName?: string;
 };
 
@@ -82,7 +82,7 @@ const empty = (): WalletData => ({
   reports: [],
 });
 
-const keyFor = (address: string) => `privabank:v${SCHEMA_VERSION}:${address.toLowerCase()}`;
+const keyFor = (address: string) => `cassafi:v${SCHEMA_VERSION}:${address.toLowerCase()}`;
 
 /* ---- tiny external store with an in-memory cache (localStorage reads are sync and slow) ---- */
 
@@ -141,7 +141,7 @@ export function clearWallet(address: string) {
 function subscribe(cb: () => void) {
   listeners.add(cb);
   const onStorage = (e: StorageEvent) => {
-    if (e.key?.startsWith("privabank:")) {
+    if (e.key?.startsWith("cassafi:")) {
       cache.clear();
       cb();
     }

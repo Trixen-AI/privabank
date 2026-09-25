@@ -33,3 +33,9 @@ dist-ssr
 
 # Vercel CLI link folder
 .vercel
+
+# Android builds: only the website copy in public/downloads/ is committed
+*.apk
+*.aab
+!public/downloads/CassaFi.apk
+mobile-android/

@@ -12,8 +12,8 @@ export const REOWN_PROJECT_ID: string = (raw.VITE_REOWN_PROJECT_ID ?? "").trim()
 /** Relayer base URL. Without it, authorizations settle from the user's wallet. */
 export const RELAYER_URL: string = (raw.VITE_RELAYER_URL ?? "").trim().replace(/\/+$/, "");
 
-const tokenAddr = (raw.VITE_PRIVA_TOKEN_ADDRESS ?? "").trim();
-/** $PRIVA contract, if deployed. */
-export const PRIVA_TOKEN: { address: Address; chainId: number } | null = isAddress(tokenAddr)
-  ? { address: tokenAddr, chainId: Number(raw.VITE_PRIVA_TOKEN_CHAIN_ID ?? 4663) }
+const tokenAddr = (raw.VITE_CASSA_TOKEN_ADDRESS ?? "").trim();
+/** $CASSA contract, if deployed. */
+export const CASSA_TOKEN: { address: Address; chainId: number } | null = isAddress(tokenAddr)
+  ? { address: tokenAddr, chainId: Number(raw.VITE_CASSA_TOKEN_CHAIN_ID ?? 4663) }
   : null;

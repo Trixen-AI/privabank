@@ -48,7 +48,7 @@ export default function Activity() {
 
   function exportChain(list: ActivityItem[]) {
     download(
-      `privabank-activity-${chain.short.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.csv`,
+      `cassafi-activity-${chain.short.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.csv`,
       csv([
         ["time", "type", "direction", "counterparty", "amount", "token", "status", "tx"],
         ...list.map((i) => [
@@ -67,7 +67,7 @@ export default function Activity() {
 
   function exportAuths(list: Authorization[]) {
     download(
-      `privabank-authorizations-${Date.now()}.csv`,
+      `cassafi-authorizations-${Date.now()}.csv`,
       csv([
         ["created", "recipient", "amount", "token", "status", "settlement", "tx", "nonce", "memo"],
         ...list.map((a) => [
@@ -89,8 +89,8 @@ export default function Activity() {
     <>
       <PageHeader
         eyebrow="Banking"
-        title="Activity"
-        sub={`Everything this address did on ${chain.name}, and every payment you authorized with PrivaBank.`}
+        title={<>Account <em>activity.</em></>}
+        sub={`Everything this address did on ${chain.name}, and every payment you authorized with CassaFi.`}
       />
 
       <div className="tabs" role="tablist">

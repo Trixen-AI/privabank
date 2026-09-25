@@ -18,11 +18,11 @@ import { limitKey, type Authorization, type WalletData } from "./store";
 /* ================================================================ domain */
 
 /**
- * EIP-712 domain for every PrivaBank signature. No verifyingContract yet: the
+ * EIP-712 domain for every CassaFi signature. No verifyingContract yet: the
  * on-chain verifier is not deployed, so signatures are scoped by name, version
  * and chain. Adding the contract later is a version bump.
  */
-export const domain = (chainId: number) => ({ name: "PrivaBank", version: "1", chainId }) as const;
+export const domain = (chainId: number) => ({ name: "CassaFi", version: "1", chainId }) as const;
 
 /* ============================================================ credential */
 
@@ -35,7 +35,7 @@ export const CREDENTIAL_TYPES = {
 } as const;
 
 export const CREDENTIAL_STATEMENT =
-  "Issue my PrivaBank spending credential for this address. This signature does not move funds and does not approve any spending.";
+  "Issue my CassaFi spending credential for this address. This signature does not move funds and does not approve any spending.";
 
 export const credentialMessage = (holder: Address, chainId: number) => ({
   holder,
@@ -50,7 +50,7 @@ export const credentialMessage = (holder: Address, chainId: number) => ({
  */
 export function deriveCredential(signature: Hex, holder: Address, chainId: number) {
   const secret = keccak256(signature);
-  const id = keccak256(encodeAbiParameters([{ type: "bytes32" }, { type: "string" }], [secret, "privabank.credential.id"]));
+  const id = keccak256(encodeAbiParameters([{ type: "bytes32" }, { type: "string" }], [secret, "cassafi.credential.id"]));
   const commitment = keccak256(
     encodeAbiParameters([{ type: "bytes32" }, { type: "address" }, { type: "uint256" }], [id, holder, BigInt(chainId)]),
   );
@@ -227,7 +227,7 @@ export async function submitToRelayer(a: Authorization): Promise<{ id: string; t
 /* ========================================================== audit reports */
 
 export type AuditReport = {
-  schema: "privabank.audit/1";
+  schema: "cassafi.audit/1";
   holder: Address;
   chainId: number;
   credential: Hex | null;
@@ -272,7 +272,7 @@ export const reportDigest = (r: AuditReport): Hex => keccak256(toBytes(canonical
 
 export const reportMessage = (r: AuditReport, digest: Hex) =>
   [
-    "PrivaBank audit report",
+    "CassaFi audit report",
     `Holder: ${r.holder}`,
     `Chain: ${r.chainId}`,
     `Period: ${r.period.from} to ${r.period.to}`,
@@ -321,7 +321,7 @@ export function buildAuditReport(
     });
 
   return {
-    schema: "privabank.audit/1",
+    schema: "cassafi.audit/1",
     holder: input.holder,
     chainId: input.chainId,
     credential: data.credential?.id ?? null,

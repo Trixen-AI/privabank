@@ -1,6 +1,6 @@
-/* PrivaBank design tokens.
+/* CassaFi design tokens.
    Role structure mirrors the reference layout system (scale, spacing, radii,
-   shadows, easing); every value is PrivaBank's own. Accent is "authorization
+   shadows, easing); every value is CassaFi's own. Accent is "authorization
    jade": the colour of permission granted. */
 
 :root {
@@ -16,10 +16,13 @@
   --jade-800: #054b39;
   --jade-900: #032e23;
 
-  --primary: #0b8a66;
-  --primary-hover: #0a7857;
-  --primary-press: #086a4f;
-  --primary-tint: #e6fff6;
+  /* One palette for the website and the app: the "night till". Ink-black
+     canvas, bone type, one bright jade signal. src/site/site.css mirrors these
+     values as --pv-* for the marketing page. */
+  --primary: #3fe0ae;
+  --primary-hover: #5fe9be;
+  --primary-press: #20cd99;
+  --primary-tint: rgba(63, 224, 174, 0.1);
 
   /* Ink ramp (cool neutral) */
   --black: #000000;
@@ -34,46 +37,48 @@
   --ink-100: #dcdedd;
   --ink-050: #f1f3f2;
   --white: #ffffff;
+  --bone: #efebe1;
+  --bone-2: #e3ded1;
+  --fog: #cfd9d5;
 
   /* Surfaces */
-  --bg: #ffffff;
-  --bg-raised: #f7f8f8;
-  --bg-subtle: #f1f3f2;
-  --bg-card: #ffffff;
+  --bg: #08090a;
+  --bg-raised: #0f1112;
+  --bg-subtle: #16191a;
+  --bg-card: #0f1112;
 
   /* Foreground */
-  --fg1: #07090a;
-  --fg2: #525a5d;
-  --fg3: #7d878a;
-  --border: #dcdedd;
-  --border-faint: rgba(0, 0, 0, 0.08);
+  --fg1: #f1eee6;
+  --fg2: #a2aaa7;
+  --fg3: #626b69;
+  --border: rgba(241, 238, 230, 0.1);
+  --border-strong: rgba(241, 238, 230, 0.22);
+  --border-faint: rgba(241, 238, 230, 0.06);
 
   /* Accent roles */
-  --accent: #0b8a66;
-  --accent-soft: rgba(11, 138, 102, 0.1);
-  --accent-tint: #e6fff6;
-  --on-accent: #ffffff;
+  --accent: #3fe0ae;
+  --accent-2: #0fae80;
+  --accent-soft: rgba(63, 224, 174, 0.12);
+  --accent-tint: rgba(63, 224, 174, 0.07);
+  --on-accent: #032a1f;
   --anthracite: #161a1c;
 
-  /* Inverted surface */
-  --invert-bg: #07090a;
-  --invert-bg-raised: #0e1113;
-  --invert-bg-card: #161a1c;
-  --invert-fg1: #ffffff;
-  --invert-fg2: #b0b8ba;
+  /* Inverted surface (bone, for light moments on the dark canvas) */
+  --invert-bg: #efebe1;
+  --invert-bg-raised: #e3ded1;
+  --invert-bg-card: #f6f3ec;
+  --invert-fg1: #0b0d0d;
+  --invert-fg2: #4a5250;
   --invert-fg3: #7d878a;
-  --invert-border: rgba(255, 255, 255, 0.1);
+  --invert-border: rgba(11, 13, 13, 0.14);
 
   /* Status */
-  --success: #0fae80;
-  --warning: #c9760a;
-  --danger: #d83a3a;
-  --info: #0a7857;
-
-  /* Category surfaces */
-  --cat-vault-bg-1: #f6faf8;
-  --cat-vault-bg-2: #e8f1ed;
-  --cat-dark-bg: #07090a;
+  --success: #3fe0ae;
+  --warning: #f2b45c;
+  --danger: #ff7a70;
+  --info: #3fe0ae;
+  --warning-soft: rgba(242, 180, 92, 0.12);
+  --danger-soft: rgba(255, 122, 112, 0.12);
 
   /* Type */
   --font-sans: "General Sans", -apple-system, "Helvetica Neue", Arial, sans-serif;
@@ -117,19 +122,19 @@
   --radius-none: 0px;
   --radius-sm: 4px;
   --radius-md: 8px;
-  --radius-lg: 14px;
-  --radius-xl: 22px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
   --radius-pill: 999px;
 
   /* Elevation */
-  --shadow-sm: 0 1px 2px rgba(7, 16, 13, 0.06);
-  --shadow-md: 0 8px 24px rgba(7, 16, 13, 0.1);
-  --shadow-lg: 0 24px 64px rgba(7, 16, 13, 0.14);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.55);
   --glow-jade: 0 0 0 1px rgba(15, 174, 128, 0.4), 0 0 40px rgba(15, 174, 128, 0.3);
   --glow-jade-soft: 0 10px 40px rgba(15, 174, 128, 0.2);
 
   /* Motion */
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-fast: 140ms;
   --dur: 240ms;
