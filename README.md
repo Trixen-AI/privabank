@@ -47,7 +47,7 @@ Protocol pieces that need infrastructure: payments settle **from the user's wall
 
 ## Before going live
 
-- **Social links.** The footer links to X only, at https://x.com/CassaFi (`SOCIALS` in `src/data/site.ts`).
+- **Social links.** The footer links to X only, at https://x.com/CassaFiMoney (`SOCIALS` in `src/data/site.ts`).
 - **X icon.** The official X logo from X's brand toolkit (https://about.x.com/content/dam/about-twitter/x/brand-toolkit/x-logo.zip), stored unmodified in `src/assets/social/x.svg` and inlined in `src/site/Footer.tsx`.
 - **Newsletter.** The footer form only validates the address and shows a message. It is not connected to a mailing list provider yet.
 - **Figures.** Network stats, counters, token figures and relayer numbers are illustrative placeholders, not live data.

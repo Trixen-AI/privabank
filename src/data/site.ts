@@ -384,4 +384,4 @@ export const FOOTER = {
 };
 
 /** Social accounts. Add more entries here if CassaFi opens other profiles. */
-export const SOCIALS = [{ key: "x", label: "CassaFi on X", handle: "@CassaFi", href: "https://x.com/CassaFi" }];
+export const SOCIALS = [{ key: "x", label: "CassaFi on X", handle: "@CassaFiMoney", href: "https://x.com/CassaFiMoney" }];
