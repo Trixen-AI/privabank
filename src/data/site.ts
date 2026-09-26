@@ -46,6 +46,13 @@ export const HERO = {
   sub: "CassaFi is an onchain neobank that runs on permission. You prove you're allowed to spend, never what you own, so there's no balance to look up and no address to follow. Merchants still get paid in clean stablecoins.",
   ctaPrimary: { label: "Get your credential", href: "/app/credential" },
   ctaSecondary: { label: "Buy $CASSA", href: "#token" },
+  // $CASSA token contract (CassaFi, 18 decimals, 1B supply), checked on-chain.
+  ca: {
+    label: "$CASSA CA",
+    chain: "Robinhood Chain",
+    address: "0x825C190C7Fa05d7FBd984020a59DC22c4C282340",
+    explorer: "https://robinhoodchain.blockscout.com/token/0x825C190C7Fa05d7FBd984020a59DC22c4C282340",
+  },
   spec: [
     { k: "Version", v: "v0.1.0" },
     { k: "Network", v: "Ethereum / Robinhood Chain" },

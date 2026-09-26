@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { ArrowUpRight, BadgeCheck, EyeOff, Wifi } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, Check, Copy, EyeOff, Wifi } from "lucide-react";
 import { HERO, HERO_DECK, RAILS } from "../data/site";
 import { Logomark, Wordmark } from "../components/ui/Logo";
 import { useReducedMotion } from "./hooks";
@@ -125,6 +125,49 @@ function Deck() {
   );
 }
 
+/** The $CASSA contract address, copyable in one tap, with a link to the explorer. */
+function ContractAddress() {
+  const [copied, setCopied] = useState(false);
+  const { ca } = HERO;
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(ca.address);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      // Clipboard blocked: the address is still selectable text.
+    }
+  }
+
+  return (
+    <div className="pv-ca">
+      <span className="pv-ca-k pv-mono">{ca.label}</span>
+      <code className="pv-ca-v" title={`${ca.address} on ${ca.chain}`}>
+        <span className="pv-ca-full">{ca.address}</span>
+        <span className="pv-ca-short" aria-hidden="true">
+          {ca.address.slice(0, 6)}…{ca.address.slice(-4)}
+        </span>
+      </code>
+      <button type="button" className="pv-ca-btn" onClick={copy} aria-label={copied ? "Contract address copied" : "Copy contract address"}>
+        {copied ? <Check size={15} /> : <Copy size={15} />}
+      </button>
+      <a
+        className="pv-ca-btn"
+        href={ca.explorer}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`View $CASSA on the ${ca.chain} explorer`}
+      >
+        <ArrowUpRight size={15} />
+      </a>
+      <span className="pv-ca-live" role="status">
+        {copied ? "Copied" : ""}
+      </span>
+    </div>
+  );
+}
+
 export function Hero() {
   return (
     <header className="pv-hero" id="top">
@@ -159,6 +202,7 @@ export function Hero() {
               {HERO.ctaSecondary.label}
             </a>
           </div>
+          <ContractAddress />
         </div>
         <p className="pv-hero-hint pv-mono">{HERO_DECK.hint}</p>
       </div>
