@@ -1,21 +1,19 @@
 import { Link } from "react-router";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowLeft, BadgeCheck, KeyRound, Send } from "lucide-react";
 import { Logo } from "../../components/ui/Logo";
 
 /* Screens shown before the dashboard proper: missing configuration, and the
-   connect step. Same composition as the website hero: mono label, a sans line
-   with an italic serif phrase, one jade action, numbered steps below. */
+   connect step. Same panel, type and palette as the website hero. */
 
 function GateFrame({ children }: { children: React.ReactNode }) {
   return (
     <div className="gate">
-      <div className="gate-glow" aria-hidden="true" />
       <header className="gate-top">
-        <Link to="/" className="brand" aria-label="CassaFi home">
+        <Link to="/" className="brand" aria-label="PrivaBank home">
           <Logo />
         </Link>
-        <Link to="/" className="btn btn-sec btn-sm">
-          Back to website
+        <Link to="/" className="gate-back">
+          <ArrowLeft size={16} /> Back to website
         </Link>
       </header>
       <main className="gate-main">{children}</main>
@@ -24,36 +22,38 @@ function GateFrame({ children }: { children: React.ReactNode }) {
 }
 
 const STEPS = [
-  { title: "Sign in", body: "Use Google, email or any wallet. Social login means there's no seed phrase to look after." },
-  { title: "Get your card", body: "Add your name and sign once. That signature creates your spending credential and never moves funds." },
-  { title: "Pay by permission", body: "Authorize payments inside the limits you set, on Robinhood Chain or Ethereum." },
+  { icon: <KeyRound size={18} />, title: "Sign in", body: "Use Google, email, or any wallet. No seed phrase to manage with social login." },
+  { icon: <BadgeCheck size={18} />, title: "Issue a credential", body: "One signature derives your spending credential. It never moves funds." },
+  { icon: <Send size={18} />, title: "Authorize payments", body: "Pay by proving permission, inside the limits you set." },
 ];
 
 export function ConnectGate({ onConnect, connecting }: { onConnect: () => void; connecting: boolean }) {
   return (
     <GateFrame>
-      <section className="gate-hero">
-        <span className="app-label">
-          <span className="app-label-dot" />
-          CassaFi app
-        </span>
-        <h1>
-          Open your account,
-          <em>off the record.</em>
-        </h1>
-        <p className="gate-sub">Connect to get your card, set your spending rules and authorize payments without putting your balance on show.</p>
-        <div className="gate-cta">
-          <button type="button" className="btn btn-pri" onClick={onConnect} disabled={connecting}>
-            {connecting ? "Connecting…" : "Sign in or connect wallet"} <ArrowUpRight size={15} />
-          </button>
-          <span className="gate-nets">Robinhood Chain · Ethereum</span>
+      <section className="panel panel--accent gate-panel">
+        <div className="panel__dots" />
+        <div className="panel__glow" />
+        <div className="panel__inner gate-inner">
+          <span className="ds-label">PrivaBank app</span>
+          <h1>
+            Open your <span className="hl">private account.</span>
+          </h1>
+          <p className="gate-sub">
+            Connect to issue your credential, set spending rules, and authorize payments on Robinhood Chain and Ethereum.
+          </p>
+          <div className="gate-cta">
+            <button type="button" className="btn btn-pri" onClick={onConnect} disabled={connecting}>
+              {connecting ? "Connecting…" : "Sign in or connect wallet"}
+            </button>
+          </div>
         </div>
       </section>
 
       <ol className="gate-steps">
         {STEPS.map((s, i) => (
           <li key={s.title}>
-            <span className="gate-step-n">{String(i + 1).padStart(2, "0")}</span>
+            <span className="gate-step-ico">{s.icon}</span>
+            <span className="ds-label">Step {i + 1}</span>
             <h2>{s.title}</h2>
             <p>{s.body}</p>
           </li>
@@ -67,10 +67,7 @@ export function SetupRequired() {
   return (
     <GateFrame>
       <section className="card setup-card">
-        <span className="app-label">
-          <span className="app-label-dot" />
-          Setup required
-        </span>
+        <span className="ds-label page-eyebrow">Setup required</span>
         <h1>Wallet connection isn't configured yet</h1>
         <p>
           The dashboard signs users in through Reown AppKit, which needs a project ID. Create a free project at{" "}

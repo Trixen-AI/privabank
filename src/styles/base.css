@@ -5,7 +5,6 @@
 }
 
 html {
-  color-scheme: dark;
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
 }
@@ -77,22 +76,24 @@ ol {
   border: 0;
 }
 
-/* ---------- Buttons ----------
-   Pills, same as the website: jade for the one action that matters, a hairline
-   outline for everything else. */
+.wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ---------- Buttons ---------- */
 .btn {
   font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1;
-  font-weight: 500;
+  font-weight: 400;
   border: 1px solid transparent;
   cursor: pointer;
-  border-radius: var(--radius-pill);
-  height: 46px;
-  padding: 0 20px;
+  border-radius: var(--radius-md);
+  padding: 13px 24px;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
   white-space: nowrap;
   transition:
@@ -102,11 +103,11 @@ ol {
     transform var(--dur-fast) var(--ease-out);
 }
 .btn:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 .btn-pri {
   background: var(--accent);
-  color: var(--on-accent);
+  color: var(--white);
 }
 .btn-pri:hover {
   background: var(--primary-hover);
@@ -114,15 +115,14 @@ ol {
 .btn-pri:active {
   background: var(--primary-press);
 }
-.btn-sec,
-.btn-glass {
+.btn-sec {
   background: transparent;
   color: var(--fg1);
-  border-color: var(--border-strong);
+  border-color: var(--border);
 }
-.btn-sec:hover,
-.btn-glass:hover {
-  border-color: var(--fg1);
+.btn-sec:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 .btn-ghost {
   background: transparent;
@@ -132,14 +132,48 @@ ol {
   background: var(--accent-soft);
   color: var(--accent);
 }
+.btn-glass {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+  border-color: rgba(255, 255, 255, 0.22);
+  backdrop-filter: saturate(140%) blur(12px);
+  -webkit-backdrop-filter: saturate(140%) blur(12px);
+}
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.32);
+}
+.btn-glass:active {
+  background: rgba(255, 255, 255, 0.24);
+}
+.btn-soon {
+  cursor: default;
+  opacity: 0.72;
+}
+.soon-badge {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.16);
+}
 
-/* ---------- Panel ----------
-   The website's feature panel: raised night surface, hairline edge, a jade
-   glow rising from one corner. */
+.arr,
+.ic-chev {
+  font-family: var(--font-mono);
+  font-style: normal;
+  line-height: 1;
+  display: inline-block;
+  transition: transform var(--dur) var(--ease-out);
+}
+
+/* ---------- Panel system ---------- */
 .panel {
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-xl);
+  border-radius: 32px;
 }
 .panel__glow,
 .panel__dots {
@@ -152,29 +186,96 @@ ol {
   position: relative;
   z-index: 1;
 }
+
 .panel--accent {
+  background: var(--accent);
+  color: var(--white);
+}
+.panel--accent::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
   background:
-    radial-gradient(90% 120% at 0% 0%, rgba(63, 224, 174, 0.14), rgba(63, 224, 174, 0) 55%),
-    linear-gradient(180deg, var(--bg-raised), var(--bg));
-  border: 1px solid var(--border);
-  color: var(--fg1);
+    radial-gradient(130% 70% at 50% -22%, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0) 52%),
+    radial-gradient(55% 55% at 2% 0%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 58%),
+    radial-gradient(55% 55% at 98% 0%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 58%);
 }
 .panel--accent .panel__dots {
-  background-image: radial-gradient(rgba(241, 238, 230, 0.5) 1px, transparent 1.2px);
-  background-size: 22px 22px;
-  opacity: 0.08;
-  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 100% 0%, #000 0%, transparent 70%);
-  mask-image: radial-gradient(ellipse 70% 80% at 100% 0%, #000 0%, transparent 70%);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.55) 1.4px, transparent 1.5px);
+  background-size: 24px 24px;
+  opacity: 0.16;
+  -webkit-mask-image: radial-gradient(ellipse 78% 65% at 50% 20%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(ellipse 78% 65% at 50% 20%, #000 0%, transparent 72%);
+}
+.panel--accent .panel__glow {
+  background: radial-gradient(
+    ellipse 52% 42% at 50% 112%,
+    rgba(255, 255, 255, 0.6),
+    rgba(194, 251, 232, 0.28) 46%,
+    rgba(255, 255, 255, 0) 72%
+  );
+}
+.panel--accent .btn-pri {
+  background: var(--white);
+  color: var(--accent);
+}
+.panel--accent .btn-pri:hover {
+  background: var(--jade-50);
+}
+.panel--accent .btn-pri:active {
+  background: var(--jade-100);
+}
+.panel--accent .btn-sec {
+  border-color: rgba(255, 255, 255, 0.45);
+  color: var(--white);
+  background: transparent;
+}
+.panel--accent .btn-sec:hover {
+  border-color: var(--white);
+  background: rgba(255, 255, 255, 0.1);
 }
 
-/* Emphasis: the website's italic serif phrase in jade. */
-.hl,
-.page-head h1 em {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: -0.02em;
+.panel--invert {
+  background: var(--invert-bg);
+  color: var(--invert-fg1);
+}
+
+.hl {
   color: var(--accent);
+}
+.panel--accent .hl {
+  color: var(--jade-100);
+}
+
+.ticker {
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Shared section heads ---------- */
+.sec-head {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 44px;
+}
+.sec-head .ds-label {
+  display: inline-block;
+  color: var(--accent);
+  margin-bottom: 18px;
+}
+.sec-head h2 {
+  font-size: var(--text-h2);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-head);
+}
+.sec-head .lead {
+  font-size: var(--text-lg);
+  line-height: var(--lh-normal);
+  color: var(--fg2);
+  margin: 16px 0 0;
 }
 
 @media (max-width: 1080px) {
@@ -192,8 +293,11 @@ ol {
     --text-h3: 24px;
     --text-lg: 16px;
   }
+  .wrap {
+    padding: 0 20px;
+  }
   .panel {
-    border-radius: var(--radius-lg);
+    border-radius: 22px;
   }
 }
 @media (max-width: 560px) {

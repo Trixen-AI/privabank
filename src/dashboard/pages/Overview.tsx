@@ -28,7 +28,7 @@ export default function Overview() {
     <>
       <PageHeader
         eyebrow="Overview"
-        title={<>Your <em>account.</em></>}
+        title="Your account"
         sub={
           <>
             {w.address ? <AddressChip address={w.address} chainId={w.chainId} /> : null} on {chain.name}
@@ -102,7 +102,7 @@ function UnsupportedNetwork() {
   if (!w.unsupported) return null;
   return (
     <Notice tone="warn" action={<button className="btn btn-sec btn-sm" onClick={() => open({ view: "Networks" })}>Switch network</button>}>
-      Your wallet is on a network CassaFi doesn't run on. Showing Robinhood Chain until you switch.
+      Your wallet is on a network PrivaBank doesn't run on. Showing Robinhood Chain until you switch.
     </Notice>
   );
 }
@@ -221,7 +221,7 @@ function CredentialCard({ data, chainId }: { data: WalletData; chainId: number }
         </>
       ) : (
         <>
-          <p className="muted">Add your name and sign once to get your CassaFi card. Signing doesn't move funds.</p>
+          <p className="muted">Add your name and sign once to get your PrivaBank card. Signing doesn't move funds.</p>
           <Link className="btn btn-pri btn-sm" to="/app/credential">
             <BadgeCheck size={15} /> Get your card
           </Link>

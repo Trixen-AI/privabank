@@ -3,18 +3,14 @@ import { Check, Copy, ExternalLink } from "lucide-react";
 import { addressUrl, txUrl } from "../lib/chains";
 import { shortAddr } from "../lib/format";
 
-/* Shared dashboard building blocks. Everything here renders from the shared
-   tokens and the website's type system (mono labels, sans headlines with an
-   italic serif phrase), so the app and the site read as one product. */
+/* Shared dashboard building blocks. Everything here renders from the site's
+   design tokens, so the dashboard and the website read as one product. */
 
 export function PageHeader({ eyebrow, title, sub, actions }: { eyebrow: string; title: ReactNode; sub?: ReactNode; actions?: ReactNode }) {
   return (
     <header className="page-head">
       <div>
-        <span className="app-label page-eyebrow">
-          <span className="app-label-dot" />
-          {eyebrow}
-        </span>
+        <span className="ds-label page-eyebrow">{eyebrow}</span>
         <h1>{title}</h1>
         {sub ? <p className="page-sub">{sub}</p> : null}
       </div>

@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./styles/fonts.css";
 import "./styles/tokens.css";
 import "./styles/base.css";
-import "./styles/brand.css";
+import "./styles/components.css";
 import { Router } from "./Router";
 
 createRoot(document.getElementById("root")!).render(

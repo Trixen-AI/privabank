@@ -16,7 +16,7 @@ import { relayerHealth } from "../lib/protocol";
 
 /**
  * The connected wallet as the dashboard sees it. `chainId` falls back to
- * Robinhood Chain when the wallet sits on a network CassaFi doesn't support,
+ * Robinhood Chain when the wallet sits on a network PrivaBank doesn't support,
  * and `unsupported` tells the UI to offer a switch.
  */
 export function useWallet() {

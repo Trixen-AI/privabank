@@ -1,247 +1,393 @@
 /**
- * All CassaFi website copy lives here so it can be edited in one place.
- * House voice: plain money-desk English, short sentences, "you" not "users",
- * no em dashes. "Cassa" is the till: the copy leans on counters, tills,
- * receipts and records rather than on vaults and walls.
+ * All PrivaBank copy lives here so it can be edited in one place.
+ * House style: short declaratives, banking nouns, no em dashes.
  */
 
 export const BRAND = {
-  name: "CassaFi",
-  legal: "CassaFi Labs",
-  ticker: "$CASSA",
-  domain: "cassafi.money",
-  tagline: "Banking, off the record.",
+  name: "PrivaBank",
+  legal: "PrivaBank Protocol",
+  ticker: "$PRIVA",
+  tagline: "Privacy as infrastructure for onchain money.",
   year: 2026,
 };
 
 /* ---------------------------------------------------------------- NAV */
 
-export const SITE_NAV = [
-  { label: "Why CassaFi", href: "#paradigm" },
-  { label: "How it works", href: "#layers" },
-  { label: "Settlement", href: "#settlement" },
-  { label: "$CASSA", href: "#token" },
-  { label: "Roadmap", href: "#roadmap" },
-  { label: "FAQ", href: "#faq" },
-];
+export type MegaLink = {
+  title: string;
+  desc: string;
+  href: string;
+  icon: string;
+  soon?: boolean;
+};
 
-/** Section names for the left-margin "you are here" rail, in page order. */
-export const SITE_SECTIONS = [
-  { id: "top", label: "Off the record" },
-  { id: "paradigm", label: "Why CassaFi" },
-  { id: "layers", label: "How it works" },
-  { id: "settlement", label: "Settlement" },
-  { id: "token", label: "$CASSA" },
-  { id: "roadmap", label: "Roadmap" },
-  { id: "faq", label: "Questions" },
-  { id: "footer", label: "Open an account" },
-];
+export const NAV = {
+  product: {
+    columns: [
+      {
+        head: "Private banking",
+        variant: "vault" as const,
+        links: [
+          {
+            title: "ZK Login",
+            desc: "Sign in with Google or email. A zero-knowledge credential stands in for a private key.",
+            href: "#pillars",
+            icon: "fingerprint",
+          },
+          {
+            title: "Shielded Pools",
+            desc: "Deposits join one shared anonymity set. Your onchain balance reads as null.",
+            href: "#network",
+            icon: "layers",
+          },
+          {
+            title: "Proof-Based Authorization",
+            desc: "Spend by proving permission. Ownership of funds is never disclosed.",
+            href: "#layers",
+            icon: "badge-check",
+          },
+        ],
+      },
+      {
+        head: "Network",
+        variant: "dark" as const,
+        links: [
+          {
+            title: "Relayer Network",
+            desc: "Relayers pay gas and route transactions, so no address of yours ever touches the chain.",
+            href: "#layers",
+            icon: "radio-tower",
+          },
+          {
+            title: "Merchant Settlement",
+            desc: "Merchants are paid in ordinary USDC or USDT with no history attached.",
+            href: "#compliance",
+            icon: "store",
+          },
+        ],
+      },
+    ],
+    cta: {
+      title: "Roadmap",
+      desc: "Four phases from core infrastructure to private payroll and treasury.",
+      href: "#roadmap",
+      icon: "route",
+    },
+  },
+  resources: {
+    links: [
+      {
+        title: "Whitepaper",
+        desc: "The authorization model, the shielded pool design, and the compliance envelope.",
+        href: "#papers",
+        icon: "file-text",
+      },
+      {
+        title: "Blog",
+        desc: "Release notes, audits, and what we are learning about private payments.",
+        href: "#papers",
+        icon: "newspaper",
+      },
+      {
+        title: "Brand",
+        desc: "Logo files, colour values, and how to write about PrivaBank.",
+        href: "#footer",
+        icon: "palette",
+      },
+    ],
+    foot: { label: "All resources", href: "#papers" },
+  },
+  developers: {
+    links: [
+      {
+        title: "Quick start",
+        desc: "Issue a credential, fund a shielded account, and send your first private payment.",
+        href: "#build",
+        icon: "terminal",
+      },
+      {
+        title: "SDK reference",
+        desc: "Credential issuance, proof construction, and relayer submission in TypeScript.",
+        href: "#build",
+        icon: "code",
+      },
+      {
+        title: "GitHub",
+        desc: "Circuits, contracts, and the relayer client, all open for review.",
+        href: "#build",
+        icon: "github",
+      },
+      {
+        title: "Run a relayer",
+        desc: "Process proofs, earn $PRIVA, and widen the anonymity set.",
+        href: "#build",
+        icon: "server",
+        soon: true,
+      },
+    ],
+    foot: { label: "Read the docs", href: "#build" },
+  },
+};
 
 /* ---------------------------------------------------------------- HERO */
 
 export const HERO = {
-  pill: { flag: "Live", text: "Private payments on Robinhood Chain", href: "#layers" },
-  h1a: "Banking,",
-  h1b: "off the record.",
-  sub: "CassaFi is an onchain neobank that runs on permission. You prove you're allowed to spend, never what you own, so there's no balance to look up and no address to follow. Merchants still get paid in clean stablecoins.",
-  ctaPrimary: { label: "Get your credential", href: "/app/credential" },
-  ctaSecondary: { label: "Buy $CASSA", href: "#token" },
-  // $CASSA token contract (CassaFi, 18 decimals, 1B supply), checked on-chain.
-  ca: {
-    label: "$CASSA CA",
-    chain: "Robinhood Chain",
-    address: "0x825C190C7Fa05d7FBd984020a59DC22c4C282340",
-    explorer: "https://robinhoodchain.blockscout.com/token/0x825C190C7Fa05d7FBd984020a59DC22c4C282340",
-  },
+  pill: { flag: "New", text: "Priva Protocol whitepaper", href: "#papers" },
+  labelPrefix: "The authorization-based",
+  labelWords: ["payments", "banking", "credentials", "settlement", "compliance", "identity"],
+  labelSuffix: "network",
+  h1a: "Privacy as ",
+  h1b: "Infrastructure.",
+  sub: "The first privacy-first, authorization-based onchain neobank. Users prove permission to spend, not ownership of funds. No public balances. No wallet addresses. Just compliant, private payments.",
+  ctaPrimary: { label: "Get credentials", href: "/app/credential" },
+  ctaSecondary: { label: "Buy $PRIVA", href: "#token" },
+  note: "PrivaBank replaces public wallets with Zero-Knowledge Login credentials. Authenticate without exposing your IP or your identity.",
+  noteLink: { label: "Read the whitepaper", href: "#papers" },
   spec: [
-    { k: "Version", v: "v0.1.0" },
+    { k: "Current version", v: "v0.1.0" },
     { k: "Network", v: "Ethereum / Robinhood Chain" },
     { k: "Status", v: "Live" },
-    { k: "Runs on", v: "Cassa Protocol" },
+    { k: "Powered by", v: "Priva Protocol" },
   ],
-};
-
-export const HERO_DECK = {
-  hint: "Tap a card to shuffle",
-  card: { holder: "CASSA MEMBER", last4: "2208", expiry: "11/30" },
-  credential: {
-    label: "Credential",
-    status: "Verified",
-    bigA: "Allowed to spend.",
-    bigB: "Nothing else shown.",
-    id: "0x9c41…a7d2",
-    rule: "Up to 500 USDC a day",
-  },
-  balance: { label: "Shielded balance", amount: "$24,592.00", publicLabel: "Onchain balance", publicValue: "null" },
 };
 
 export const RAILS = {
-  cap: "Pays out on open rails",
+  cap: "Settles on open money rails",
 };
 
-/* ---------------------------------------------------------------- WHY (paradigm) */
+/* ---------------------------------------------------------------- PARADIGM */
 
 export const PARADIGM = {
-  label: "Why CassaFi",
-  h2a: "Your balance is ",
-  h2b: "nobody's business.",
-  lead: "Public chains turned every payment into a permanent public record. CassaFi starts from the other end: the ledger proves a payment was allowed and says nothing else.",
-  tiles: [
-    {
-      tag: "Before",
-      title: "The open ledger",
-      body: "Share one address and you share everything behind it: what you earn, what you owe, and everyone you've ever paid. That record never expires.",
+  label: "The paradigm shift",
+  h2a: "From glass houses to ",
+  h2b: "steel vaults.",
+  lead: "Most chains treat privacy as a feature you bolt on later. PrivaBank treats it as the floor the rest of the bank stands on.",
+  cards: {
+    problem: {
+      title: "Transparent chains",
+      body: "In the old world your balance is a public record and your history never expires. Anyone who learns one address learns your salary, your rent, and everyone you pay.",
+      counter: { value: "1,284,660", caption: "public balances indexed today by open explorers" },
+      chips: [
+        "payroll · 2,480 USDC",
+        "rent · 1,900 USDC",
+        "transfer · 0.42 ETH",
+        "refund · 82.40 USDT",
+        "invoice #4471",
+        "settlement · 640 USDC",
+        "subscription · 12 USDC",
+        "vendor · 3,100 USDT",
+      ],
+      link: "See what a public ledger reveals",
     },
-    {
-      tag: "The pool",
-      title: "One shared pool",
-      body: "Deposits go into a common shielded pool and stop belonging to any visible account. A proof of permission moves the money, not a balance someone can read.",
+    vault: {
+      title: "Shielded pools",
+      body: "Deposits join one shared pool and stop being individually addressable. There is no account to read, so an authorization proof takes the place of a balance.",
+      link: "How the shielded pool works",
     },
-    {
-      tag: "The account",
-      title: "A bank account, minus the audience",
-      body: "Get paid, save and spend the way you would with any bank card. The one difference is who can watch, and the answer is nobody outside the account.",
+    bank: {
+      title: "Private neobanking",
+      body: "Hold funds, spend at merchants, and receive payouts with the convenience of a bank account and the discretion of cash. Nothing about the account is legible from outside it.",
+      link: "Open a PrivaBank account",
     },
+  },
+};
+
+/* ---------------------------------------------------------------- NETWORK */
+
+export const NETWORK = {
+  liveLabel: "Live on mainnet",
+  h2a: "The infrastructure of ",
+  h2b: "privacy.",
+  desc: "A relayer network that verifies authorization proofs and settles stablecoins, running continuously across independent operators.",
+  heroStat: { value: "48,317,902", label: "Authorization proofs verified" },
+  stats: [
+    { value: "3,912,004", label: "Private payments", sub: "+18,240 / 24h" },
+    { value: "612,885", label: "Credentials issued", sub: "+1,905 / 24h" },
+  ],
+  epoch: { number: "118", remain: "05:12:44", filled: 7, total: 22 },
+  explore: "View network explorer",
+  cards: [
+    { label: "Relayer node", key: "eu-west · 34ms", left: "18%", top: "58%" },
+    { label: "Relayer node", key: "ap-south · 71ms", left: "70%", top: "34%" },
   ],
 };
+
+/* ---------------------------------------------------------------- PILLARS */
 
 export const PILLARS = {
-  label: "Three ideas",
-  h2a: "Private by default, ",
-  h2b: "plain to use.",
+  label: "Three pillars",
+  h2a: "Sovereignty without ",
+  h2b: "complexity.",
+  lead: "A PrivaBank account has no seed phrase to lose and no address to leak. Three pieces of infrastructure carry the whole experience.",
   items: [
     {
+      icon: "fingerprint",
       title: "ZK Identity",
-      body: "Sign in with Google or email. A zero-knowledge credential confirms the account is yours without saying who you are or where you signed in from, so there's no private key to guard.",
+      body: "Log in with Google or email. The credential proves you are entitled to the account without revealing who you are or where you connected from.",
     },
     {
+      icon: "layers",
       title: "Shielded Liquidity",
-      body: "Your money sits in a shared anonymity set, which is why your onchain balance reads as null. Privacy isn't a mode you switch on. It's how every account starts.",
+      body: "Funds sit in a shared anonymity set rather than in an account of your own. Privacy is the default state, not a mode you switch on.",
     },
     {
+      icon: "wand-sparkles",
       title: "Invisible Execution",
-      body: "Relayers pay the gas and route each transaction. You approve the payment and nothing more, so no address of yours is ever recorded.",
+      body: "Relayers cover gas and route every transaction. You authorize the payment and nothing else, so no address of yours is ever written down.",
     },
   ],
 };
 
-/* ---------------------------------------------------------------- HOW IT WORKS (layers) */
+/* ---------------------------------------------------------------- COMPLIANCE */
 
-export const LAYERS = {
-  label: "How it works",
-  h2a: "Four layers, ",
-  h2b: "one quiet payment.",
-  lead: "Each layer does one job and can be upgraded without touching the others. Together they turn a sign-in into a settled payment in under two seconds.",
-  items: [
-    {
-      id: "identity",
-      tab: "Identity & Auth",
-      tags: ["ZK Login", "Credential issuance"],
-      body: "Your usual Google or email sign-in is exchanged for a zero-knowledge credential. It shows you're entitled to the account and nothing more, so there's no key to lose and nothing for a phisher to steal.",
-    },
-    {
-      id: "liquidity",
-      tab: "Privacy Liquidity",
-      tags: ["Shielded pools", "UTXO model"],
-      body: "Each deposit becomes a commitment in a UTXO set inside the shielded pool. There's no account balance to query, only notes that a valid proof is allowed to spend.",
-    },
-    {
-      id: "execution",
-      tab: "Execution Layer",
-      tags: ["Relayers", "Gas abstraction"],
-      body: "A relayer takes your signed proof, covers the gas and submits it. Because the relayer pays, the transaction never points back to an address you hold.",
-    },
-    {
-      id: "settlement",
-      tab: "Settlement Layer",
-      tags: ["Stablecoins", "Onchain finality"],
-      body: "Funds leave the pool as stablecoins backed one to one and settle with onchain finality. The merchant receives a transfer that looks like any other transfer.",
-    },
-  ],
-  trace: {
-    title: "Payment trace",
-    running: "Running",
-    done: "Settled",
-    lines: [
-      ["00.000", "sign-in", "credential 0x9c41…a7d2 ready"],
-      ["00.038", "limit", "60 of 500 USDC used today"],
-      ["00.040", "merchant", "found on your allowlist"],
-      ["00.176", "proof", "permission proven"],
-      ["00.590", "relayer", "gas covered, tx submitted"],
-      ["01.712", "settle", "42.00 USDC paid to merchant"],
-      ["01.713", "ledger", "your address: not recorded"],
-    ] as [string, string, string][],
-  },
-  note: "Each line is one of your own rules being checked. If a rule fails, nothing gets signed.",
-};
-
-/* ---------------------------------------------------------------- SETTLEMENT */
-
-export const SETTLEMENT = {
+export const COMPLIANCE = {
   label: "Settlement",
-  h2a: "Quiet at the counter. ",
-  h2b: "Clean at the bank.",
-  lead: "Your privacy ends where the merchant's books begin. They receive ordinary USDC or USDT that they can deposit, reconcile and show an auditor like any other payment.",
-  panelLabel: "Proof to payout",
-  big: "< 2s",
-  bigUnit: "to settle",
-  bars: [
-    { k: "Paid to the merchant in standard USDC or USDT", v: "100%", fill: 1 },
-    { k: "Your payment history the merchant can see", v: "0%", fill: 0 },
-  ],
-  panelNote: "Timed from proof check to stablecoin payout on Robinhood Chain.",
+  h2a: "Private for you. ",
+  h2b: "Compliant for them.",
+  desc: "The privacy stops at the till. Merchants are paid in ordinary stablecoins they can bank, audit, and account for like any other receipt.",
   stats: [
     {
       value: "$",
       key: "Clean settlement",
-      desc: "Merchants get plain USDC or USDT. No taint, no attached history, only the amount they're owed.",
+      desc: "Merchants receive standard USDC or USDT with no taint and no attached history.",
     },
     {
       value: "100%",
       key: "Regulatory compliance",
-      desc: "The protocol itself enforces daily limits, merchant allowlists and signed audit reports.",
+      desc: "Daily limits, merchant allowlists, and signed audit reports are built into the protocol.",
     },
     {
       value: "< 2s",
       key: "Settlement time",
-      desc: "A payment is verified and paid out in under two seconds on Robinhood Chain.",
+      desc: "Proof verification and stablecoin payout complete in under two seconds on Robinhood Chain.",
+    },
+  ],
+  cta: { label: "Set your spending controls", href: "/app/controls" },
+};
+
+/* ---------------------------------------------------------------- LAYERS */
+
+export const LAYERS = {
+  h2a: "The technology of ",
+  h2b: "sound money.",
+  lead: "Four layers, each doing one job, each replaceable without touching the others.",
+  cta: { label: "Read the architecture", href: "#papers" },
+  items: [
+    {
+      id: "identity",
+      tab: "Identity & Auth",
+      icon: "fingerprint",
+      quote:
+        "ZK Login issues a credential from an ordinary Google or email sign-in. The credential proves entitlement to an account without naming the holder, so there is no private key to manage and nothing to phish.",
+      cite: "Identity & Auth",
+      tags: ["ZK Login", "Credential issuance"],
+    },
+    {
+      id: "liquidity",
+      tab: "Privacy Liquidity",
+      icon: "layers",
+      quote:
+        "Deposits enter a shielded pool as commitments in a UTXO set. Your onchain balance is null because there is no balance to read, only notes that a valid proof can consume.",
+      cite: "Privacy Liquidity",
+      tags: ["Shielded pools", "UTXO model"],
+    },
+    {
+      id: "execution",
+      tab: "Execution Layer",
+      icon: "radio-tower",
+      quote:
+        "Relayers accept a signed proof, pay the gas, and submit the transaction on your behalf. Gas abstraction removes the last link between a payment and an address you control.",
+      cite: "Execution Layer",
+      tags: ["Relayers", "Gas abstraction"],
+    },
+    {
+      id: "settlement",
+      tab: "Settlement Layer",
+      icon: "banknote",
+      quote:
+        "Payouts leave the pool as fully backed stablecoins and settle with onchain finality. What the merchant banks is a one to one claim, indistinguishable from any other transfer.",
+      cite: "Settlement Layer",
+      tags: ["Stablecoins", "Onchain finality"],
     },
   ],
 };
 
-/* ---------------------------------------------------------------- TOKEN (pinned stage) */
+/* ---------------------------------------------------------------- PAPERS */
 
-export const STAGE = {
-  label: "The $CASSA economy",
-  lines: ["Nothing to look up.", "Nothing to trace."],
-  after: "One token, four jobs. Each card is a reason $CASSA exists.",
+export const PAPERS = {
+  label: "Research",
+  h2: "Read the protocol",
+  lead: "Everything that makes authorization-based banking work is written down, specified, and open to review before you trust a cent to it.",
+  items: [
+    {
+      name: "Priva",
+      sub: "Authorization-Based Banking on a Shielded Pool",
+      rest: "The protocol paper: credentials, notes, proofs, and settlement",
+      date: "September 2026",
+      variant: "jade" as const,
+    },
+    {
+      name: "Warden",
+      sub: "Compliance Without Disclosure",
+      rest: "Spending limits, merchant allowlists, and audit reports under zero knowledge",
+      date: "September 2026",
+      variant: "dark" as const,
+    },
+  ],
+  cta: { label: "View all research", href: "#papers" },
 };
 
+/* ---------------------------------------------------------------- TOKEN */
+
 export const TOKEN = {
+  label: "Token",
+  h2a: "Powered by ",
+  h2b: "$PRIVA.",
+  lead: "$PRIVA pays the people who keep the anonymity set wide and the proofs verified. Real payment volume becomes real demand for the token, and the operators who carry the load are the ones who earn from it.",
+  buttons: [
+    { label: "$PRIVA token", href: "#token", icon: "coins", primary: true },
+    { label: "View tokenomics", href: "#token", icon: "chart-pie", primary: false },
+  ],
   tabs: [
     {
       idx: "01",
       tab: "Relayer Incentives",
-      title: "Relayers earn $CASSA for every proof they process",
-      fig: { v: "1,240", k: "$CASSA per relayer, weekly" },
+      title: "Relayers earn for every proof they carry",
+      body: "Operators collect $PRIVA fees for verifying zero-knowledge proofs and submitting transactions. The more relayers run, the wider the anonymity set gets for everyone in the pool.",
+      figs: [
+        { v: "1,240", k: "$PRIVA earned / relayer / week" },
+        { v: "+12.5%", k: "Reward rate, 30d" },
+      ],
     },
     {
       idx: "02",
       tab: "Governance Rights",
-      title: "Holders vote on the rules the circuits enforce",
-      fig: { v: "P4", k: "Proposal open now" },
+      title: "Holders set the rules the circuits enforce",
+      body: "Verification keys, daily spending limits, and compliance policy all change by vote. Governance is the only way those parameters move, and every change is published before it takes effect.",
+      figs: [
+        { v: "P4", k: "Live proposal" },
+        { v: "68.2%", k: "Quorum reached" },
+      ],
     },
     {
       idx: "03",
       tab: "Fee Shielding",
-      title: "Pay fees in $CASSA and keep gas off your stablecoins",
-      fig: { v: "-25%", k: "Off every fee" },
+      title: "Pay fees in $PRIVA at a discount",
+      body: "Settling transaction fees in $PRIVA takes 25 percent off and decouples your stablecoin balance from gas entirely. Your spending balance stays a spending balance.",
+      figs: [
+        { v: "-25%", k: "Fee discount" },
+        { v: "0", k: "Stablecoin gas spent" },
+      ],
     },
     {
       idx: "04",
       tab: "Protocol Treasury",
-      title: "A share of fees pays for audits and new circuits",
-      fig: { v: "18%", k: "Of fees to treasury" },
+      title: "A treasury that funds the next circuit",
+      body: "A share of every fee accrues to a treasury that pays for audits, circuit work, and relayer bootstrapping. The treasury spends only where governance has voted.",
+      figs: [
+        { v: "18%", k: "Fee share to treasury" },
+        { v: "4", k: "Audits funded" },
+      ],
     },
   ],
 };
@@ -250,34 +396,115 @@ export const TOKEN = {
 
 export const ROADMAP = {
   label: "Roadmap",
-  h2a: "Where CassaFi ",
-  h2b: "goes next.",
-  lead: "Four phases, from the first private payment to institutions running payroll off the record.",
+  h2a: "The path to ",
+  h2b: "default privacy.",
+  lead: "Four phases toward a compliant, authorization-based neobank that nobody has to configure.",
   steps: [
     {
       k: "01. Core infra",
-      title: "Core infrastructure",
-      body: "ZK Login, the shielded pool and the first relayers working together end to end.",
+      title: "Core Infrastructure",
+      body: "ZK Login, the shielded pool, and the first relayer network running end to end on testnet.",
       done: true,
     },
     {
       k: "02. Compliance",
       title: "Compliance",
-      body: "Daily limits, merchant allowlists and automatic audit reports, so private spending is also safe spending.",
+      body: "Daily spending limits, merchant allowlists, and automated audit reports for safe everyday spending.",
       done: true,
     },
     {
       k: "03. Growth",
       title: "Growth",
-      body: "$CASSA goes live, anyone can run a relayer, and private settlement reaches more chains.",
+      body: "The $PRIVA launch, a permissionless relayer set, and shielded settlement beyond a single chain.",
       done: false,
     },
     {
       k: "04. Scale",
       title: "Scale",
-      body: "Recurring payments, private payroll and treasury accounts for institutions that need discretion and an audit trail at the same time.",
+      body: "Recurring payments, private payroll, and treasury accounts for institutions that need both discretion and an audit trail.",
       done: false,
     },
+  ],
+  cta: { label: "Learn more", href: "#papers" },
+};
+
+/* ---------------------------------------------------------------- CTA */
+
+type CtaButton = { label: string; href: string; primary: boolean; soon?: boolean };
+type CtaBox = {
+  label: string;
+  title: string;
+  body: string;
+  visual: "phone" | "code" | "relayer";
+  buttons: CtaButton[];
+};
+
+export const CTA: {
+  h2a: string;
+  h2b: string;
+  sub: string;
+  tiles: string[];
+  boxes: CtaBox[];
+  features: { icon: string; text: string }[];
+  phone: { label: string; amount: string };
+  code: string[];
+  relayer: { k: string; v: string }[];
+} = {
+  h2a: "Driving the next generation of ",
+  h2b: "wealth.",
+  sub: "PrivaBank is built for people who want financial privacy without giving up the things that make a bank useful. Create your credentials and start moving money quietly.",
+  tiles: ["shield-check", "key-round", "fingerprint", "banknote", "lock", "receipt"],
+  boxes: [
+    {
+      label: "Account",
+      title: "Get credentials",
+      body: "Sign in, receive a zero-knowledge credential, and fund a shielded balance in a couple of minutes.",
+      visual: "phone",
+      buttons: [{ label: "Sign up", href: "/app", primary: true }],
+    },
+    {
+      label: "Build",
+      title: "Build on PrivaBank",
+      body: "Add private balances and proof-based payments to your own product with the TypeScript SDK.",
+      visual: "code",
+      buttons: [
+        { label: "Quick start", href: "#build", primary: true },
+        { label: "Docs", href: "#build", primary: false },
+      ],
+    },
+    {
+      label: "Network",
+      title: "Run a relayer",
+      body: "Verify proofs, pay gas on behalf of users, and earn $PRIVA for widening the anonymity set.",
+      visual: "relayer",
+      buttons: [
+        { label: "Run a relayer", href: "#build", primary: false, soon: true },
+        { label: "Buy $PRIVA", href: "#token", primary: false },
+      ],
+    },
+  ],
+  features: [
+    { icon: "shield-check", text: "Zero-knowledge architecture, proof-based by default" },
+    { icon: "key-round", text: "Non-custodial: you control your funds at all times" },
+    { icon: "eye-off", text: "Privacy by default, never an opt-in setting" },
+    { icon: "banknote", text: "Merchants settle in standard USDC and USDT" },
+    { icon: "gauge", text: "Settlement under two seconds" },
+    { icon: "file-check", text: "Signed audit reports without disclosure" },
+  ],
+  phone: { label: "Shielded balance", amount: "$24,592.00" },
+  code: [
+    "const cred = await priva.login({ provider: \"google\" });",
+    "const proof = await cred.authorize({",
+    "  amount: 42_00, asset: \"USDC\",",
+    "  merchant: \"m_7f3a\",",
+    "});",
+    "await relayer.submit(proof); // < 2s",
+  ],
+  relayer: [
+    { k: "Proofs relayed", v: "18,240 / 24h" },
+    { k: "Median latency", v: "34 ms" },
+    { k: "Fees earned", v: "1,240 $PRIVA" },
+    { k: "Uptime", v: "99.98%" },
   ],
 };
 
@@ -285,37 +512,36 @@ export const ROADMAP = {
 
 export const FAQ = {
   label: "FAQ",
-  h2a: "Questions, ",
-  h2b: "answered plainly.",
-  cta: "Open the app",
+  h2a: "Frequently asked ",
+  h2b: "questions.",
   items: [
     {
-      q: "What is CassaFi?",
-      a: "An onchain neobank where spending is based on permission, not ownership. Instead of a public wallet you hold a zero-knowledge credential. Your money sits in a shielded pool, relayers submit your payments, and merchants receive normal stablecoins.",
+      q: "What is PrivaBank?",
+      a: "PrivaBank is an onchain neobank built on authorization rather than ownership. Instead of a public wallet holding a public balance, you hold a zero-knowledge credential that proves you are allowed to spend. Funds live in a shielded pool, payments are routed by relayers, and merchants are paid in ordinary stablecoins.",
     },
     {
-      q: "Where does my money live if I have no address?",
-      a: "Each deposit becomes a note in a shared shielded pool. Only a valid proof can spend it, and nothing in the pool carries your name or an address. That's why nobody can look up your balance or link one of your payments to the next.",
+      q: "If there is no wallet address, how do I hold money?",
+      a: "Your deposit becomes a note inside a shared shielded pool. The note is a commitment that only a valid proof can consume. Nothing in the pool is addressed to you, which is why an outside observer cannot read your balance, and why there is no address to correlate across payments.",
     },
     {
-      q: "What does paying by permission look like?",
-      a: "At checkout you don't show a key that says the money is yours. You show a proof that a rule allows this payment: your credential is valid, the note is unspent, and the amount fits your limit. The protocol checks the proof and the merchant gets paid.",
+      q: "What does authorization-based mean in practice?",
+      a: "When you pay, you do not present a key that says these funds are mine. You present a proof that says a rule permits this spend: the credential is valid, the note has not been consumed, and the amount sits inside your limit. The protocol verifies the proof and the payment settles.",
     },
     {
-      q: "Does CassaFi work with regulation?",
-      a: "It was designed for it. The circuits enforce your limits, allowlists and signed audit reports, so an auditor can receive a report they can verify without anyone publishing a spending history. Merchants receive clean USDC or USDT.",
+      q: "Is this compatible with regulation?",
+      a: "That is the point of the design. Daily limits, merchant allowlists, and signed audit reports are enforced by the circuits themselves, so a regulator or an auditor can be given a verifiable report without anyone publishing a spending history. Merchants receive clean USDC or USDT with no history attached.",
     },
     {
-      q: "Who pays for gas?",
-      a: "Relayers do. They take your proof, cover the network fee and submit the transaction, which keeps your own addresses off the chain. They earn $CASSA for it.",
+      q: "Who pays the gas?",
+      a: "Relayers do. They accept your proof, cover the network fee, and submit the transaction. That is what keeps your own addresses off the chain entirely, and it is what relayers earn $PRIVA for.",
     },
     {
-      q: "What is $CASSA used for?",
-      a: "It pays relayers for the proofs they process. It gives holders a vote on verification keys, spending limits and compliance policy. You can also pay transaction fees with it at 25 percent off, so gas never touches your stablecoin balance.",
+      q: "What is $PRIVA for?",
+      a: "Three things: it pays relayers for verifying proofs, it gives holders the vote over verification keys, spending limits, and compliance policy, and it can be spent on transaction fees at a 25 percent discount so your stablecoin balance stays untouched by gas.",
     },
     {
-      q: "What happens if I lose my phone?",
-      a: "There's no seed phrase to lose. Your credential is issued again from the same zero-knowledge sign-in you used the first time, and recovering it doesn't reveal who you are.",
+      q: "Can I lose access if I lose my device?",
+      a: "There is no seed phrase to lose. Credentials are re-issued from the same zero-knowledge login you set up originally, so recovering an account does not require you to have stored a secret and does not reveal your identity to the network.",
     },
   ],
 };
@@ -323,35 +549,19 @@ export const FAQ = {
 /* ---------------------------------------------------------------- FOOTER */
 
 export const FOOTER = {
-  h2a: "Keep your money ",
-  h2b: "to yourself.",
-  sub: "Get your credential in a couple of minutes and make your first private payment today.",
-  cta: { label: "Open an account", href: "/app" },
-  ctaSecondary: { label: "How it works", href: "#layers" },
-  built: "Made for private money.",
   blurb:
-    "CassaFi is an onchain neobank built on authorization. Prove you may spend, keep your balance to yourself, and settle in stablecoins any business can bank.",
+    "A privacy-first, authorization-based onchain neobank. Prove permission to spend, keep your balance to yourself, and settle in stablecoins anyone can bank.",
   newsletter: {
-    label: "Release notes",
-    placeholder: "Your email",
+    label: "Stay up to date",
+    placeholder: "Enter email for updates",
     button: "Subscribe",
-    success: "You're on the list. Release notes and privacy updates will come to your inbox.",
-    error: "That address doesn't look right. Check it and try again.",
+    success: "Thanks. You are on the list for privacy updates and release notes.",
+    error: "That did not go through. Please check the address and try again.",
   },
   app: {
-    label: "Mobile app",
-    body: "CassaFi for iOS and Android.",
-    android: {
-      label: "Download for Android",
-      meta: "APK · 1.0.0 · 52 MB",
-      // Served from this site (public/downloads/). vercel.json makes it a download named CassaFi.apk.
-      href: "/downloads/CassaFi.apk",
-      filename: "CassaFi.apk",
-    },
-    ios: {
-      label: "iPhone",
-      badge: "Coming soon",
-    },
+    label: "Get the app",
+    body: "Download the PrivaBank app on your mobile device.",
+    badge: "Coming soon",
   },
   columns: [
     {
@@ -359,19 +569,27 @@ export const FOOTER = {
       links: [
         { label: "Open the app", href: "/app" },
         { label: "ZK Login", href: "/app/credential" },
-        { label: "Shielded Pools", href: "#paradigm" },
+        { label: "Shielded Pools", href: "#network" },
         { label: "Proof-Based Authorization", href: "/app/pay" },
         { label: "Relayer Network", href: "#layers" },
-        { label: "$CASSA Token", href: "#token" },
+        { label: "$PRIVA Token", href: "#token" },
       ],
     },
     {
-      head: "Learn",
+      head: "Resources",
       links: [
-        { label: "How it works", href: "#layers" },
-        { label: "Settlement", href: "#settlement" },
+        { label: "Documentation", href: "#build" },
+        { label: "Whitepaper", href: "#papers" },
+        { label: "Blog", href: "#papers" },
         { label: "Roadmap", href: "#roadmap" },
-        { label: "FAQ", href: "#faq" },
+      ],
+    },
+    {
+      head: "Company",
+      links: [
+        { label: "About PrivaBank", href: "#paradigm" },
+        { label: "Brand assets", href: "#footer" },
+        { label: "Careers", href: "#footer" },
       ],
     },
     {
@@ -384,11 +602,11 @@ export const FOOTER = {
     },
   ],
   legal: [
-    { label: "Terms", href: "#footer" },
-    { label: "Privacy", href: "#footer" },
-    { label: "Cookies", href: "#footer" },
+    { label: "Terms of Service", href: "#footer" },
+    { label: "Privacy Policy", href: "#footer" },
+    { label: "Cookie Policy", href: "#footer" },
   ],
 };
 
-/** Social accounts. Add more entries here if CassaFi opens other profiles. */
-export const SOCIALS = [{ key: "x", label: "CassaFi on X", handle: "@CassaFiMoney", href: "https://x.com/CassaFiMoney" }];
+/** Social accounts. Add more entries here if PrivaBank opens other profiles. */
+export const SOCIALS = [{ key: "x", label: "PrivaBank on X", href: "https://x.com/PrivaBank" }];
