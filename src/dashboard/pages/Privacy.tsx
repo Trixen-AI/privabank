@@ -148,7 +148,7 @@ export default function Privacy() {
             )}
           </Card>
 
-          <Card label="With PrivaBank" title="How authorization-based banking changes this">
+          <Card label="With Spectral" title="How authorization-based banking changes this">
             <ul className="compare">
               <li>
                 <span className="compare-k">Balance</span>

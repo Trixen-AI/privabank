@@ -8,7 +8,7 @@ import { REOWN_PROJECT_ID } from "../lib/env";
  * Wallet layer. Created once, at module load, as Reown's docs require:
  * createAppKit must run outside React, before any hook reads it.
  *
- * Robinhood Chain first (it is where PrivaBank settles), then Ethereum. Email and social login are on because that *is* the product's
+ * Robinhood Chain first (it is where Spectral settles), then Ethereum. Email and social login are on because that *is* the product's
  * "ZK Login": a user signs in with Google or email and never sees a seed phrase.
  */
 export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [robinhood, mainnet];
@@ -30,9 +30,9 @@ createAppKit({
   defaultNetwork: robinhood,
   projectId: REOWN_PROJECT_ID,
   metadata: {
-    name: "PrivaBank",
+    name: "Spectral",
     description: "Privacy-first, authorization-based onchain neobank.",
-    url: typeof window !== "undefined" ? window.location.origin : "https://privahub.money",
+    url: typeof window !== "undefined" ? window.location.origin : "https://spectral.money",
     icons: [typeof window !== "undefined" ? `${window.location.origin}/brand/logo-500.png` : ""],
   },
   features: {
@@ -43,10 +43,10 @@ createAppKit({
     swaps: false,
     onramp: false,
   },
-  themeMode: "light",
+  themeMode: "dark",
   themeVariables: {
-    "--w3m-accent": "#0b8a66",
-    "--w3m-color-mix": "#0b8a66",
+    "--w3m-accent": "#b600ff",
+    "--w3m-color-mix": "#050507",
     "--w3m-color-mix-strength": 6,
     "--w3m-font-family": '"General Sans", -apple-system, "Helvetica Neue", Arial, sans-serif',
     "--w3m-border-radius-master": "2px",

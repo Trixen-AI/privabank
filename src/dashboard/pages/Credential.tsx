@@ -82,7 +82,7 @@ export default function Credential() {
         deterministic: null,
         holderName: holder.value,
       });
-      toast({ tone: "ok", title: "Your PrivaBank card is ready", body: `Issued to ${holder.value} on ${chainMeta(chainId).name}` });
+      toast({ tone: "ok", title: "Your Spectral card is ready", body: `Issued to ${holder.value} on ${chainMeta(chainId).name}` });
     } catch (e) {
       setError(humanError(e));
     } finally {
@@ -241,7 +241,7 @@ export default function Credential() {
           <Card label="New credential" title="Issue your spending credential">
             <ol className="cred-steps">
               <li>
-                <strong>Enter the name for your card.</strong> It's printed on your PrivaBank card.
+                <strong>Enter the name for your card.</strong> It's printed on your Spectral card.
                 <label className="field cred-name">
                   <span className="visually-hidden">Name on card</span>
                   <input
@@ -266,7 +266,7 @@ export default function Credential() {
                 <strong>The credential is derived from that signature.</strong> The signature is hashed immediately and never stored.
               </li>
               <li>
-                <strong>Your card is issued.</strong> A PrivaBank card tied to the credential, ready to authorize payments.
+                <strong>Your card is issued.</strong> A Spectral card tied to the credential, ready to authorize payments.
               </li>
             </ol>
             <div className="row-actions">

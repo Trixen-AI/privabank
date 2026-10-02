@@ -46,7 +46,7 @@ export function Nav() {
     <>
       <nav className="nav" data-screen-label="Nav">
         <div className="nav-inner">
-          <SmartLink className="brand" href="#top" aria-label="PrivaBank home">
+          <SmartLink className="brand" href="#top" aria-label="Spectral home">
             <Logo />
           </SmartLink>
 

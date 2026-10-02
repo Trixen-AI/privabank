@@ -1,5 +1,5 @@
 /**
- * Original PrivaBank artwork: a dotted grid overlay, the whitepaper cover marks,
+ * Original Spectral artwork: a dotted grid overlay, the whitepaper cover marks,
  * a small phone mock for the CTA panel, and the wide illustration in the
  * "private neobanking" card. All drawn by hand as inline SVG from the token
  * palette, so they stay sharp and re-colour with the theme.
@@ -31,7 +31,7 @@ export function DotField({ gap = 17, dot = 1.3, opacity = 0.3 }: { gap?: number;
  * Cover mark for the protocol paper: concentric authorization rings around a
  * closed aperture, with one ring broken where a proof passes through.
  */
-export function PaperMarkPriva() {
+export function PaperMarkSpectral() {
   return (
     <svg className="paper-art" viewBox="0 0 286 320" fill="none" aria-hidden="true">
       <g stroke="rgba(255,255,255,0.35)" strokeWidth="1.2" fill="none">
@@ -59,9 +59,9 @@ export function PaperMarkWarden() {
       <g>
         {[0, 1, 2, 3, 4, 5].map((i) => (
           <g key={i} transform={`translate(52 ${96 + i * 26})`}>
-            <rect width="182" height="14" rx="3" fill="rgba(78,227,180,0.09)" />
-            <rect width={54 + ((i * 37) % 96)} height="14" rx="3" fill="rgba(78,227,180,0.22)" />
-            <rect x={150} width="32" height="14" rx="3" fill="rgba(78,227,180,0.14)" />
+            <rect width="182" height="14" rx="3" fill="rgba(215, 173, 255,0.09)" />
+            <rect width={54 + ((i * 37) % 96)} height="14" rx="3" fill="rgba(215, 173, 255,0.22)" />
+            <rect x={150} width="32" height="14" rx="3" fill="rgba(215, 173, 255,0.14)" />
           </g>
         ))}
       </g>
@@ -71,27 +71,27 @@ export function PaperMarkWarden() {
         width="202"
         height="26"
         rx="5"
-        fill="rgba(78,227,180,0.16)"
-        stroke="rgba(143,242,208,0.6)"
+        fill="rgba(215, 173, 255,0.16)"
+        stroke="rgba(227, 199, 255,0.6)"
         strokeWidth="1.2"
       />
       <path
         d="M56 69l6 6 12-13"
-        stroke="rgba(143,242,208,0.95)"
+        stroke="rgba(227, 199, 255,0.95)"
         strokeWidth="2.4"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       />
-      <rect x="86" y="65" width="120" height="6" rx="3" fill="rgba(143,242,208,0.55)" />
-      <g stroke="rgba(78,227,180,0.4)" strokeWidth="1.2" strokeDasharray="4 6">
+      <rect x="86" y="65" width="120" height="6" rx="3" fill="rgba(227, 199, 255,0.55)" />
+      <g stroke="rgba(215, 173, 255,0.4)" strokeWidth="1.2" strokeDasharray="4 6">
         <path d="M42 262h202" />
       </g>
       <text
         x="143"
         y="286"
         textAnchor="middle"
-        fill="rgba(194,251,232,0.75)"
+        fill="rgba(238, 223, 255,0.75)"
         fontFamily="ui-monospace, monospace"
         fontSize="11"
         letterSpacing="3"
@@ -109,11 +109,11 @@ export function PaperMarkWarden() {
 export function PhoneMock({ label, amount }: { label: string; amount: string }) {
   return (
     <svg width="168" height="270" viewBox="0 0 168 270" fill="none" role="img" aria-label={`${label} ${amount}`}>
-      <rect x="1" y="1" width="166" height="268" rx="24" fill="rgba(3,46,35,0.72)" stroke="rgba(255,255,255,0.28)" />
-      <rect x="9" y="9" width="150" height="252" rx="18" fill="rgba(7,9,10,0.62)" />
+      <rect x="1" y="1" width="166" height="268" rx="24" fill="rgba(5, 5, 7,0.72)" stroke="rgba(255,255,255,0.28)" />
+      <rect x="9" y="9" width="150" height="252" rx="18" fill="rgba(5, 5, 7,0.62)" />
       <rect x="62" y="17" width="44" height="6" rx="3" fill="rgba(255,255,255,0.22)" />
 
-      <text x="26" y="58" fill="rgba(194,251,232,0.75)" fontFamily="ui-monospace, monospace" fontSize="8" letterSpacing="2">
+      <text x="26" y="58" fill="rgba(238, 223, 255,0.75)" fontFamily="ui-monospace, monospace" fontSize="8" letterSpacing="2">
         {label.toUpperCase()}
       </text>
       <text x="26" y="84" fill="#ffffff" fontFamily="ui-monospace, monospace" fontSize="21">
@@ -122,25 +122,25 @@ export function PhoneMock({ label, amount }: { label: string; amount: string }) 
 
       <g>
         <rect x="26" y="98" width="72" height="7" rx="3.5" fill="rgba(255,255,255,0.16)" />
-        <rect x="102" y="98" width="24" height="7" rx="3.5" fill="rgba(78,227,180,0.45)" />
+        <rect x="102" y="98" width="24" height="7" rx="3.5" fill="rgba(215, 173, 255,0.45)" />
       </g>
 
       <rect x="18" y="122" width="132" height="1" fill="rgba(255,255,255,0.12)" />
 
       {[0, 1, 2].map((i) => (
         <g key={i} transform={`translate(26 ${138 + i * 34})`}>
-          <rect width="26" height="26" rx="8" fill="rgba(78,227,180,0.16)" />
-          <rect x="7" y="9" width="12" height="8" rx="2" fill="rgba(143,242,208,0.7)" />
+          <rect width="26" height="26" rx="8" fill="rgba(215, 173, 255,0.16)" />
+          <rect x="7" y="9" width="12" height="8" rx="2" fill="rgba(227, 199, 255,0.7)" />
           <rect x="36" y="3" width={52 - i * 9} height="6" rx="3" fill="rgba(255,255,255,0.3)" />
           <rect x="36" y="15" width={34 + i * 7} height="5" rx="2.5" fill="rgba(255,255,255,0.14)" />
-          <rect x={92 + i * 4} y="9" width={24 - i * 4} height="7" rx="3.5" fill="rgba(194,251,232,0.55)" />
+          <rect x={92 + i * 4} y="9" width={24 - i * 4} height="7" rx="3.5" fill="rgba(238, 223, 255,0.55)" />
         </g>
       ))}
 
       <rect x="26" y="244" width="116" height="1" fill="rgba(255,255,255,0.1)" />
       <g transform="translate(26 226)">
         <rect width="116" height="3" rx="1.5" fill="rgba(255,255,255,0.1)" />
-        <rect width="74" height="3" rx="1.5" fill="rgba(78,227,180,0.6)" />
+        <rect width="74" height="3" rx="1.5" fill="rgba(215, 173, 255,0.6)" />
       </g>
     </svg>
   );
@@ -152,9 +152,9 @@ export function PhoneMock({ label, amount }: { label: string; amount: string }) 
  * balance panel behind stays sealed.
  */
 export function NeobankArt() {
-  const S = "rgba(11,138,102,0.9)";
-  const M = "rgba(11,138,102,0.12)";
-  const L = "rgba(15,174,128,0.55)";
+  const S = "rgba(215, 173, 255, 0.9)"; // lilac line
+  const M = "rgba(215, 173, 255, 0.1)"; // lilac tint
+  const L = "rgba(182, 0, 255, 0.75)"; // violet signal
   return (
     <svg viewBox="0 0 320 168" fill="none" role="img" aria-label="A credential authorising a payment to a merchant">
       {/* sealed balance panel */}
@@ -163,11 +163,11 @@ export function NeobankArt() {
         <path d="M22 54h72M22 70h52M22 86h64M22 102h40" strokeDasharray="2 7" />
       </g>
       <rect x="40" y="114" width="36" height="14" rx="7" fill={S} />
-      <path d="M52 121h12" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M52 121h12" stroke="#050507" strokeWidth="1.6" strokeLinecap="round" />
 
       {/* credential card */}
       <g transform="translate(120 40)">
-        <rect width="80" height="52" rx="8" fill="#fff" stroke={S} strokeWidth="1.4" />
+        <rect width="80" height="52" rx="8" fill="#16151b" stroke={S} strokeWidth="1.4" />
         <rect x="10" y="12" width="18" height="13" rx="3" fill={L} />
         <path d="M10 36h34M10 43h22" stroke={S} strokeWidth="1.4" strokeLinecap="round" />
         <circle cx="62" cy="36" r="9" fill={M} stroke={S} strokeWidth="1.2" />
@@ -180,7 +180,7 @@ export function NeobankArt() {
 
       {/* merchant till */}
       <g transform="translate(244 24)">
-        <rect width="70" height="120" rx="10" fill="#fff" stroke={S} strokeWidth="1.4" />
+        <rect width="70" height="120" rx="10" fill="#16151b" stroke={S} strokeWidth="1.4" />
         <rect x="12" y="14" width="46" height="30" rx="5" fill={M} stroke={S} strokeWidth="1.2" />
         <path d="M22 29h26" stroke={S} strokeWidth="1.6" strokeLinecap="round" />
         {[0, 1, 2].map((i) => (

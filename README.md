@@ -1,6 +1,6 @@
-# PrivaBank
+# Spectral
 
-The website and product dashboard for PrivaBank, a privacy-first, authorization-based onchain neobank. Built with React 19, Vite, TypeScript and React Router, using plain CSS. The dashboard lives at `/app` and connects wallets through Reown AppKit.
+The website and product dashboard for Spectral, a privacy-first, authorization-based onchain neobank. Built with React 19, Vite, TypeScript and React Router, using plain CSS. The dashboard lives at `/app` and connects wallets through Reown AppKit.
 
 ## Setup
 
@@ -38,7 +38,7 @@ npm run brand    # regenerate the wordmark paths and the files in public/brand/
 | Credential | Issue a credential from one EIP-712 signature (verified on-chain, EOA or ERC-1271), re-verify, revoke |
 | Exposure report | What the public ledger reveals about the address: balance, nonce, counterparties, ENS, token footprint |
 | Spending controls | Daily limits per asset, merchant allowlist, signed audit reports and a verifier |
-| $PRIVA | Balance, supply and fee-shielding status once `VITE_PRIVA_TOKEN_ADDRESS` is set |
+| $SPECTRAL | Balance, supply and fee-shielding status once `VITE_SPECTRAL_TOKEN_ADDRESS` is set |
 | Settings | Account, network switching, relayer status, backup / restore / clear of on-device data |
 
 Networks: Robinhood Chain (4663), Ethereum (1), Robinhood Chain Testnet (46630), Sepolia. Credentials, limits, allowlists, authorizations and reports are stored per address in the browser (`localStorage`, versioned); only public values are kept, never signatures used as secrets.
@@ -47,15 +47,15 @@ Protocol pieces that need infrastructure: payments settle **from the user's wall
 
 ## Before going live
 
-- **Social links.** The footer links to X only, at https://x.com/PrivaBank (`SOCIALS` in `src/data/site.ts`).
+- **Social links.** The footer links to X only, at https://x.com/SpectralPay (`SOCIALS` in `src/data/site.ts`).
 - **X icon.** X's brand toolkit is gated, so the X link uses a neutral placeholder mark. Drop the official SVG into `src/assets/social/` and inline it in `Footer.tsx`.
 - **Newsletter.** The footer form only validates the address and shows a message. It is not connected to a mailing list provider yet.
 - **Figures.** Network stats, counters, token figures and relayer numbers are illustrative placeholders, not live data.
-- **Links.** Info links point to anchors on the landing page; product actions (Log in, Sign up, Get credentials, Buy $PRIVA) open the dashboard.
-- **Hosting.** Deployed on Vercel at https://privahub.money. `vercel.json` rewrites unknown paths to `index.html` so `/app/*` routes survive a refresh; `robots.txt` keeps `/app` out of search.
+- **Links.** Info links point to anchors on the landing page; product actions (Log in, Sign up, Get credentials, Buy $SPECTRAL) open the dashboard.
+- **Hosting.** Deployed on Vercel at https://spectral.money. `vercel.json` rewrites unknown paths to `index.html` so `/app/*` routes survive a refresh; `robots.txt` keeps `/app` out of search.
 
 ## Third-party marks
 
-USDC and Tether logos are the official files from each brand's own kit. The Robinhood logo comes from Wikimedia Commons, because robinhood.com's press kit could not be reached; replace it with the press-kit file if you have it. All are used unmodified, only to name what PrivaBank settles on. PrivaBank is not affiliated with Robinhood, Circle or Tether. Source URLs are recorded in `src/components/sections/Hero.tsx`.
+USDC and Tether logos are the official files from each brand's own kit. The Robinhood logo comes from Wikimedia Commons, because robinhood.com's press kit could not be reached; replace it with the press-kit file if you have it. All are used unmodified, only to name what Spectral settles on. Spectral is not affiliated with Robinhood, Circle or Tether. Source URLs are recorded in `src/components/sections/Hero.tsx`.
 
-The PrivaBank card shows the Visa, Mastercard or Discover mark for its number's network. The brand portals (brand.visa.com, mastercard.com/brandcenter) require sign-in or block automated download, so these are the Wikimedia Commons copies of the current official artwork, stored unmodified in `src/assets/networks/`; on the dark card CSS applies each brand's reversed (white) variant. Replace them with the brand-kit files when you have access. Sources are listed in `src/dashboard/ui/BankCard.tsx`.
+The Spectral card shows the Visa, Mastercard or Discover mark for its number's network. The brand portals (brand.visa.com, mastercard.com/brandcenter) require sign-in or block automated download, so these are the Wikimedia Commons copies of the current official artwork, stored unmodified in `src/assets/networks/`; on the dark card CSS applies each brand's reversed (white) variant. Replace them with the brand-kit files when you have access. Sources are listed in `src/dashboard/ui/BankCard.tsx`.

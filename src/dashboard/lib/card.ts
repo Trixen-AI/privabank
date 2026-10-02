@@ -1,7 +1,7 @@
 import { encodeAbiParameters, keccak256, type Hex } from "viem";
 
 /**
- * The PrivaBank card attached to a credential.
+ * The Spectral card attached to a credential.
  *
  * Every value is derived from the credential ID, so the same credential always
  * shows the same card and nothing extra needs storing. The number follows the
@@ -33,7 +33,7 @@ function luhnCheckDigit(partial: string) {
 export const luhnValid = (n: string) => luhnCheckDigit(n.slice(0, -1)) === n.slice(-1);
 
 export function deriveCard(credentialId: Hex, issuedAt: number): BankCardData {
-  const h = keccak256(encodeAbiParameters([{ type: "bytes32" }, { type: "string" }], [credentialId, "privabank.card.v1"]));
+  const h = keccak256(encodeAbiParameters([{ type: "bytes32" }, { type: "string" }], [credentialId, "spectral.card.v1"]));
   const digits = h
     .slice(2)
     .match(/.{2}/g)!

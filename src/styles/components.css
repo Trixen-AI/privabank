@@ -3,10 +3,10 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: saturate(180%) blur(14px);
-  -webkit-backdrop-filter: saturate(180%) blur(14px);
-  border-bottom: 1px solid var(--border-faint);
+  background: rgba(5, 5, 7, 0.78);
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  border-bottom: 1px solid var(--border);
 }
 .nav-inner {
   max-width: 1200px;
@@ -25,18 +25,20 @@
   padding-right: 8px;
 }
 /* The mark's glyph fills about 70% of its 64-unit box, so the box is sized up
-   to put the drawn P at roughly the wordmark's height. */
+   to put the drawn S at roughly the wordmark's height. */
 .brand .logomark {
   height: 32px;
   width: auto;
   display: block;
 }
+/* The wordmark box runs from cap height down to the "p" descender, so it is set
+   taller than the old one to keep the same cap height. */
 .brand .wordmark {
-  height: 19px;
+  height: 23px;
   width: auto;
   display: block;
 }
-/* "Priva" in ink, "Bank" in jade: the one colour break in the wordmark. */
+/* The wordmark is one colour (chalk); the mark carries the accent. */
 .wordmark .wm-a {
   fill: var(--fg1);
 }
@@ -193,7 +195,7 @@
   color: var(--accent);
 }
 .mega-link--accent:hover {
-  background: rgba(11, 138, 102, 0.16);
+  background: rgba(215, 173, 255, 0.16);
 }
 .mega-cta {
   margin-top: 6px;
@@ -343,7 +345,7 @@
 }
 
 /* ============================ HERO ============================ */
-/* The reference hero is locked to the viewport. PrivaBank's hero carries two
+/* The reference hero is locked to the viewport. Spectral's hero carries two
    extra blocks (the credential note and the spec strip), so it fills the
    viewport as a floor and grows past it rather than crushing them. */
 .hero {
@@ -379,7 +381,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 26px;
-  color: var(--jade-100);
+  color: var(--violet-100);
 }
 .hero-news {
   display: inline-flex;
@@ -414,7 +416,7 @@
   font-size: 10px;
   letter-spacing: var(--tracking-mono);
   text-transform: uppercase;
-  color: var(--jade-100);
+  color: var(--violet-100);
 }
 .hn-live i {
   width: 7px;
@@ -429,7 +431,7 @@
 }
 .hero-news .arr {
   font-size: 16px;
-  color: var(--jade-100);
+  color: var(--violet-100);
 }
 .hero h1 {
   font-size: var(--text-display);
@@ -492,13 +494,13 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1px;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: var(--border);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
 .hero-spec > div {
-  background: rgba(3, 46, 35, 0.22);
+  background: var(--bg-raised);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   padding: 14px 12px;
@@ -562,6 +564,13 @@
 .marquee:hover .logo-cell {
   opacity: 1;
 }
+/* On the dark canvas each mark shows as its brand's reversed (white, one-colour)
+   variant, which the Robinhood, Circle and Tether kits all provide for dark
+   backgrounds. Shapes and proportions are untouched. */
+.logo-cell img {
+  filter: brightness(0) invert(1);
+  opacity: 0.72;
+}
 
 /* ============================ PARADIGM (intro) ============================ */
 .intro {
@@ -599,7 +608,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: var(--bg);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 28px 28px 24px;
@@ -646,6 +655,7 @@
 .intro-card--dark {
   background: var(--cat-dark-bg);
   border: 0;
+  box-shadow: inset 0 0 0 1px var(--border);
   position: relative;
   overflow: hidden;
 }
@@ -663,7 +673,7 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: linear-gradient(122deg, rgba(7, 9, 10, 0.97) 0%, rgba(7, 9, 10, 0.86) 34%, rgba(7, 9, 10, 0.22) 88%);
+  background: linear-gradient(122deg, rgba(5, 5, 7, 0.97) 0%, rgba(5, 5, 7, 0.86) 34%, rgba(5, 5, 7, 0.22) 88%);
 }
 /* Only the text sits above the scrim. The canvas must keep its own absolute
    positioning, so it is deliberately not covered by this rule. */
@@ -681,10 +691,10 @@
   color: var(--invert-fg2);
 }
 .intro-card--dark:hover {
-  box-shadow: inset 0 0 0 1px var(--jade-400);
+  box-shadow: inset 0 0 0 1px var(--violet-400);
 }
 .intro-card--dark .ic-link {
-  color: var(--jade-300);
+  color: var(--violet-300);
 }
 .intro-card--wide {
   grid-column: 1 / -1;
@@ -705,7 +715,7 @@
 /* Exposure counter device */
 .bc-live {
   margin-bottom: 18px;
-  border-top: 1px solid rgba(7, 9, 10, 0.1);
+  border-top: 1px solid var(--border);
   padding-top: 16px;
 }
 .bc-count {
@@ -742,8 +752,8 @@
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--fg3);
-  background: rgba(7, 9, 10, 0.05);
-  border: 1px solid rgba(7, 9, 10, 0.07);
+  background: rgba(245, 243, 250, 0.04);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 5px 9px;
   white-space: nowrap;
@@ -778,7 +788,7 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(70% 60% at 50% 22%, rgba(3, 46, 35, 0.72), rgba(3, 46, 35, 0) 68%);
+  background: radial-gradient(70% 60% at 50% 22%, rgba(5, 5, 7, 0.72), rgba(5, 5, 7, 0) 68%);
 }
 .globe-panel .panel__inner {
   padding: 56px 32px 0;
@@ -791,15 +801,15 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--jade-100);
+  color: var(--violet-100);
   margin-bottom: 16px;
 }
 .gs-livelabel i {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--jade-200);
-  box-shadow: 0 0 8px var(--jade-300);
+  background: var(--violet-200);
+  box-shadow: 0 0 8px var(--violet-300);
   animation: spPulse 1.7s var(--ease-in-out) infinite;
 }
 .globe-panel h2 {
@@ -831,7 +841,7 @@
   letter-spacing: -0.02em;
   color: var(--white);
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 2px 24px rgba(3, 46, 35, 0.8);
+  text-shadow: 0 2px 24px rgba(5, 5, 7, 0.8);
 }
 .gs-hero-lbl {
   font-family: var(--font-mono);
@@ -848,7 +858,7 @@
   width: 300px;
   padding: 16px;
   border-radius: var(--radius-lg);
-  background: rgba(3, 26, 20, 0.52);
+  background: rgba(17, 17, 22, 0.52);
   border: 1px solid rgba(255, 255, 255, 0.16);
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
@@ -877,7 +887,7 @@
 .gs-sub {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--jade-200);
+  color: var(--violet-200);
 }
 .gs-epoch {
   margin-top: 16px;
@@ -907,13 +917,13 @@
   background: rgba(255, 255, 255, 0.14);
 }
 .gs-seg.on {
-  background: var(--jade-300);
-  box-shadow: 0 0 8px rgba(78, 227, 180, 0.5);
+  background: var(--violet-300);
+  box-shadow: 0 0 8px rgba(215, 173, 255, 0.5);
 }
 .gs-explore {
   margin-top: 14px;
   font-size: 12.5px;
-  color: var(--jade-200);
+  color: var(--violet-200);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -933,7 +943,7 @@
   z-index: 2;
   padding: 9px 12px;
   border-radius: var(--radius-md);
-  background: rgba(3, 26, 20, 0.6);
+  background: rgba(17, 17, 22, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -952,7 +962,7 @@
   font-size: 9px;
   letter-spacing: var(--tracking-mono);
   text-transform: uppercase;
-  color: var(--jade-200);
+  color: var(--violet-200);
 }
 .mc-key {
   font-family: var(--font-mono);
@@ -1092,7 +1102,7 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: radial-gradient(46% 58% at 50% 42%, rgba(7, 9, 10, 0.9), rgba(7, 9, 10, 0.55) 58%, rgba(7, 9, 10, 0) 100%);
+  background: radial-gradient(46% 58% at 50% 42%, rgba(5, 5, 7, 0.9), rgba(5, 5, 7, 0.55) 58%, rgba(5, 5, 7, 0) 100%);
 }
 .bt-thorns canvas {
   display: block;
@@ -1110,7 +1120,7 @@
 }
 .bt-label {
   display: inline-block;
-  color: var(--jade-300);
+  color: var(--violet-300);
   margin-bottom: 18px;
 }
 .bt-h2 {
@@ -1122,7 +1132,7 @@
   margin: 0 auto;
 }
 .bt-h2 .hl {
-  color: var(--jade-300);
+  color: var(--violet-300);
 }
 .bt-desc {
   font-size: var(--text-lg);
@@ -1144,7 +1154,7 @@
   text-align: left;
 }
 .bt-stat {
-  background: rgba(7, 9, 10, 0.72);
+  background: rgba(5, 5, 7, 0.72);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   padding: 22px 18px;
@@ -1156,7 +1166,7 @@
   font-family: var(--font-mono);
   font-size: 30px;
   line-height: 1;
-  color: var(--jade-300);
+  color: var(--violet-300);
 }
 .bt-stat .k {
   font-size: 14px;
@@ -1199,10 +1209,10 @@
 }
 .comp-panel {
   background: linear-gradient(160deg, var(--cat-vault-bg-1) 0%, var(--cat-vault-bg-2) 100%);
-  --invert-fg1: #07231b;
-  --invert-fg2: #45605a;
-  --invert-fg3: #8ba39c;
-  --invert-border: rgba(3, 46, 35, 0.14);
+  --invert-fg1: var(--fg1);
+  --invert-fg2: var(--fg2);
+  --invert-fg3: var(--fg3);
+  --invert-border: var(--border);
 }
 .comp-panel .panel__inner {
   padding: 0;
@@ -1249,7 +1259,7 @@
   border-radius: var(--radius-sm);
   display: grid;
   place-items: center;
-  background: rgba(11, 138, 102, 0.12);
+  background: rgba(215, 173, 255, 0.12);
   color: var(--accent);
 }
 .comp-logo svg {
@@ -1268,7 +1278,7 @@
   height: 32px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--invert-border);
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(245, 243, 250, 0.1);
   color: var(--invert-fg2);
   display: grid;
   place-items: center;
@@ -1322,7 +1332,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent);
-  background: rgba(11, 138, 102, 0.1);
+  background: rgba(215, 173, 255, 0.1);
   border-radius: var(--radius-pill);
   padding: 5px 10px;
 }
@@ -1389,7 +1399,7 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  background: linear-gradient(165deg, var(--jade-600), var(--jade-800));
+  background: linear-gradient(165deg, var(--violet-600), var(--violet-800));
 }
 .paper-cover .dots {
   position: absolute;
@@ -1427,8 +1437,8 @@
   letter-spacing: 0.045em;
   color: #fff;
   text-shadow:
-    0 0 13px var(--jade-800),
-    0 0 26px var(--jade-900),
+    0 0 13px var(--violet-800),
+    0 0 26px var(--violet-900),
     0 1px 10px rgba(0, 0, 0, 0.4);
 }
 .ps-rest {
@@ -1438,7 +1448,7 @@
   color: rgba(255, 255, 255, 0.9);
   max-width: 24ch;
   text-shadow:
-    0 0 12px var(--jade-800),
+    0 0 12px var(--violet-800),
     0 1px 9px rgba(0, 0, 0, 0.35);
 }
 .paper-body {
@@ -1482,7 +1492,11 @@
   border-radius: inherit;
   overflow: hidden;
   pointer-events: none;
-  background: var(--accent);
+  /* Carbon panel with the violet signal glowing up from the mark behind the copy. */
+  background:
+    radial-gradient(60% 70% at 50% 55%, rgba(182, 0, 255, 0.2), rgba(182, 0, 255, 0) 72%),
+    var(--bg-card);
+  box-shadow: inset 0 0 0 1px var(--border);
 }
 .token-bg canvas {
   display: block;
@@ -1509,15 +1523,15 @@
   pointer-events: none;
   background: radial-gradient(
     60% 75% at 50% 50%,
-    rgba(11, 138, 102, 0.72) 0%,
-    rgba(11, 138, 102, 0.4) 48%,
-    rgba(11, 138, 102, 0) 78%
+    rgba(5, 5, 7, 0.82) 0%,
+    rgba(5, 5, 7, 0.5) 48%,
+    rgba(5, 5, 7, 0) 78%
   );
   filter: blur(30px);
 }
 .token .ds-label {
   display: inline-block;
-  color: var(--jade-100);
+  color: var(--accent);
   margin-bottom: 18px;
 }
 .token-head h2 {
@@ -1527,7 +1541,7 @@
   color: var(--white);
   max-width: 20ch;
   margin: 0 auto;
-  text-shadow: 0 1px 14px rgba(3, 46, 35, 0.6);
+  text-shadow: 0 1px 14px rgba(5, 5, 7, 0.6);
 }
 .token-head .lead {
   font-size: var(--text-lg);
@@ -1535,7 +1549,7 @@
   line-height: var(--lh-normal);
   margin: 20px auto 0;
   max-width: 62ch;
-  text-shadow: 0 1px 14px rgba(3, 46, 35, 0.6);
+  text-shadow: 0 1px 14px rgba(5, 5, 7, 0.6);
 }
 .token-head-btns {
   margin-top: 30px;
@@ -1590,7 +1604,7 @@
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.1em;
-  color: var(--jade-100);
+  color: var(--violet-100);
 }
 .token-body {
   min-height: 200px;
@@ -1661,7 +1675,7 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(40% 34% at 50% 8%, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(40% 34% at 50% 8%, rgba(182, 0, 255, 0.2), rgba(182, 0, 255, 0) 70%);
 }
 .cta-tiles {
   position: absolute;
@@ -1720,7 +1734,7 @@
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-lg);
-  background: rgba(3, 46, 35, 0.3);
+  background: rgba(5, 5, 7, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -1733,7 +1747,7 @@
   font-size: 10px;
   letter-spacing: var(--tracking-mono);
   text-transform: uppercase;
-  color: var(--jade-100);
+  color: var(--violet-100);
 }
 .cta-catbox h3 {
   font-size: var(--text-h4);
@@ -1772,12 +1786,12 @@
   margin: 18px 0 0;
   padding: 14px 14px;
   border-radius: var(--radius-md);
-  background: rgba(7, 9, 10, 0.55);
+  background: rgba(5, 5, 7, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.12);
   font-family: var(--font-mono);
   font-size: 11.5px;
   line-height: 1.7;
-  color: var(--jade-100);
+  color: var(--violet-100);
   overflow-x: auto;
   white-space: pre;
 }
@@ -1795,7 +1809,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 11px 14px;
-  background: rgba(7, 9, 10, 0.4);
+  background: rgba(5, 5, 7, 0.4);
 }
 .cta-relayer dt {
   font-size: 13px;
@@ -1832,7 +1846,7 @@
 .cta-feat svg {
   width: 17px;
   height: 17px;
-  color: var(--jade-200);
+  color: var(--violet-200);
 }
 
 /* ============================ FAQ ============================ */
@@ -1942,7 +1956,7 @@
   fill: var(--white);
 }
 .footer-brand .wordmark .wm-b {
-  fill: var(--jade-300);
+  fill: var(--violet-300);
 }
 .footer-brand > p {
   margin-top: 18px;
@@ -1983,12 +1997,12 @@
 }
 .footer-news-input:focus {
   outline: none;
-  border-color: var(--jade-400);
+  border-color: var(--violet-400);
 }
 .footer-news-msg {
   margin-top: 10px;
   font-size: 13px;
-  color: var(--jade-300);
+  color: var(--violet-300);
 }
 .footer-app {
   margin-top: 26px;
@@ -2007,7 +2021,7 @@
   font-size: 10px;
   letter-spacing: var(--tracking-mono);
   text-transform: uppercase;
-  color: var(--jade-300);
+  color: var(--violet-300);
   border: 1px solid var(--invert-border);
   border-radius: var(--radius-pill);
   padding: 5px 11px;
@@ -2027,7 +2041,7 @@
   transition: color var(--dur) var(--ease-out);
 }
 .footer-col a:hover {
-  color: var(--jade-300);
+  color: var(--violet-300);
 }
 .socials {
   display: flex;
@@ -2049,8 +2063,8 @@
 }
 .socials a:hover {
   color: var(--white);
-  border-color: var(--jade-400);
-  background: rgba(15, 174, 128, 0.14);
+  border-color: var(--violet-400);
+  background: rgba(215, 173, 255, 0.14);
 }
 .socials svg {
   width: 16px;
@@ -2077,7 +2091,7 @@
   flex-wrap: wrap;
 }
 .footer-legal a:hover {
-  color: var(--jade-300);
+  color: var(--violet-300);
 }
 .footer-wordmark {
   position: relative;
@@ -2142,12 +2156,12 @@
   0% {
     opacity: 0;
     transform: translateY(10px);
-    color: var(--jade-500);
+    color: var(--violet-500);
   }
   45% {
     opacity: 1;
     transform: translateY(0);
-    color: var(--jade-600);
+    color: var(--violet-300);
   }
   100% {
     opacity: 1;

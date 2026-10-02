@@ -13,7 +13,7 @@ export function Router() {
         <Route
           path="/app/*"
           element={
-            <Suspense fallback={<div className="app-loading" aria-busy="true">Loading PrivaBank…</div>}>
+            <Suspense fallback={<div className="app-loading" aria-busy="true">Loading Spectral…</div>}>
               <DashboardApp />
             </Suspense>
           }

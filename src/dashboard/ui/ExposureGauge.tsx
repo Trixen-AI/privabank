@@ -3,7 +3,7 @@
  * account is readable by strangers, so the ring runs jade (low) to red (severe).
  */
 const TONE: Record<string, string> = {
-  Low: "var(--jade-500)",
+  Low: "var(--violet-500)",
   Moderate: "#c9a20a",
   High: "var(--warning)",
   Severe: "var(--danger)",

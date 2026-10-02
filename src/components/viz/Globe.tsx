@@ -3,12 +3,12 @@ import * as THREE from "three";
 import { usePrefersReducedMotion } from "../../hooks";
 
 /**
- * PrivaBank relayer globe.
+ * Spectral relayer globe.
  *
  * An original point-cloud sphere: dots scattered with a Fibonacci lattice so the
  * density stays even, a brighter ring of "relayer" nodes on a tilted band, and
  * proof arcs that travel between random node pairs and fade. The sphere turns
- * slowly on its own axis. Everything is drawn from the jade token ramp.
+ * slowly on its own axis. Everything is drawn from the violet token ramp.
  */
 export function Globe() {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -38,7 +38,7 @@ export function Globe() {
     const positions = new Float32Array(DOTS * 3);
     const colors = new Float32Array(DOTS * 3);
     const golden = Math.PI * (3 - Math.sqrt(5));
-    const base = new THREE.Color("#8bf2d0"); // lighter than the panel jade, or the shell vanishes into it
+    const base = new THREE.Color("#e3c7ff"); // lighter than the panel violet, or the shell vanishes into it
     const lit = new THREE.Color("#ffffff");
 
     for (let i = 0; i < DOTS; i++) {
@@ -94,7 +94,7 @@ export function Globe() {
     world.add(
       new THREE.Points(
         nodeGeo,
-        new THREE.PointsMaterial({ size: 0.11, color: 0xc2fbe8, transparent: true, opacity: 0.95, depthWrite: false }),
+        new THREE.PointsMaterial({ size: 0.11, color: 0xeedfff, transparent: true, opacity: 0.95, depthWrite: false }),
       ),
     );
 
@@ -122,7 +122,7 @@ export function Globe() {
       geo.setDrawRange(0, 0);
       const line = new THREE.Line(
         geo,
-        new THREE.LineBasicMaterial({ color: 0x8bf2d0, transparent: true, opacity: 0.9 }),
+        new THREE.LineBasicMaterial({ color: 0xe3c7ff, transparent: true, opacity: 0.9 }),
       );
       arcGroup.add(line);
       arcs.push({ line, born: now, life: 2600, count: SEGMENTS + 1 });

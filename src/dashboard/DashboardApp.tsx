@@ -14,7 +14,7 @@ const WalletRoot = lazy(() => import("./WalletRoot"));
 /** React 19 hoists these into <head>: the app has its own title and stays out of search results. */
 const appHead = (
   <>
-    <title>PrivaBank App</title>
+    <title>Spectral App</title>
     <meta name="robots" content="noindex, nofollow" />
   </>
 );
@@ -30,7 +30,7 @@ export default function DashboardApp() {
   return (
     <>
       {appHead}
-      <Suspense fallback={<div className="app-loading" aria-busy="true">Loading PrivaBank…</div>}>
+      <Suspense fallback={<div className="app-loading" aria-busy="true">Loading Spectral…</div>}>
         <WalletRoot />
       </Suspense>
     </>

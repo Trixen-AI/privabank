@@ -1,4 +1,4 @@
-/* PrivaBank dashboard. Built only from the website's tokens (tokens.css) and
+/* Spectral dashboard. Built only from the website's tokens (tokens.css) and
    shared primitives (.btn, .panel, .ds-label), so the app and the site read as
    one product. Loaded with the /app chunk only. */
 
@@ -121,7 +121,7 @@
   background: var(--warning);
 }
 .side-dot.on {
-  background: var(--jade-400);
+  background: var(--violet-400);
 }
 .side-bottom {
   margin-top: auto;
@@ -146,7 +146,7 @@
   align-items: center;
   gap: 12px;
   padding: 0 32px;
-  background: rgba(247, 248, 248, 0.78);
+  background: rgba(5, 5, 7, 0.8);
   backdrop-filter: saturate(180%) blur(14px);
   -webkit-backdrop-filter: saturate(180%) blur(14px);
   border-bottom: 1px solid var(--border-faint);
@@ -185,16 +185,16 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--jade-400);
-  box-shadow: 0 0 0 3px rgba(32, 205, 153, 0.18);
+  background: var(--violet-400);
+  box-shadow: 0 0 0 3px rgba(215, 173, 255, 0.2);
 }
 .net-pill--bad {
-  border-color: rgba(216, 58, 58, 0.4);
+  border-color: rgba(255, 122, 133, 0.4);
   color: var(--danger);
 }
 .net-pill--bad .net-dot {
   background: var(--danger);
-  box-shadow: 0 0 0 3px rgba(216, 58, 58, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 122, 133, 0.15);
 }
 .net-test {
   font-family: var(--font-mono);
@@ -211,8 +211,8 @@
   height: 22px;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 30% 30%, var(--jade-200), transparent 60%),
-    linear-gradient(135deg, var(--jade-500), var(--jade-800));
+    radial-gradient(circle at 30% 30%, var(--violet-200), transparent 60%),
+    linear-gradient(135deg, var(--violet-500), var(--violet-800));
 }
 
 .dash-content {
@@ -275,10 +275,10 @@
 }
 .btn-danger {
   background: var(--danger);
-  color: var(--white);
+  color: #2a0a10;
 }
 .btn-danger:hover {
-  background: #b92f2f;
+  background: #ff95a0;
 }
 .icon-btn {
   display: inline-grid;
@@ -401,16 +401,16 @@
   white-space: nowrap;
 }
 .badge--ok {
-  background: rgba(15, 174, 128, 0.12);
-  color: var(--jade-700);
+  background: var(--success-soft);
+  color: var(--success);
 }
 .badge--warn {
-  background: rgba(201, 118, 10, 0.12);
-  color: #97580a;
+  background: var(--warning-soft);
+  color: var(--warning);
 }
 .badge--bad {
-  background: rgba(216, 58, 58, 0.1);
-  color: #b12f2f;
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 .badge--info {
   background: var(--accent-soft);
@@ -438,23 +438,23 @@
 }
 .notice--info {
   background: var(--accent-tint);
-  border-color: rgba(11, 138, 102, 0.2);
-  color: var(--jade-800);
+  border-color: rgba(215, 173, 255, 0.24);
+  color: var(--violet-100);
 }
 .notice--warn {
-  background: #fff8ec;
-  border-color: rgba(201, 118, 10, 0.28);
-  color: #7a4708;
+  background: var(--warning-soft);
+  border-color: rgba(242, 180, 92, 0.3);
+  color: #f6cf95;
 }
 .notice--bad {
-  background: #fff3f3;
-  border-color: rgba(216, 58, 58, 0.28);
-  color: #9c2828;
+  background: var(--danger-soft);
+  border-color: rgba(255, 122, 133, 0.3);
+  color: #ffb3ba;
 }
 .notice--ok {
-  background: var(--accent-tint);
-  border-color: rgba(11, 138, 102, 0.24);
-  color: var(--jade-800);
+  background: var(--success-soft);
+  border-color: rgba(127, 224, 184, 0.28);
+  color: #b9f0d8;
 }
 .notice-action {
   flex: none;
@@ -497,7 +497,7 @@
 .skel {
   display: block;
   border-radius: var(--radius-md);
-  background: linear-gradient(90deg, var(--bg-subtle), #e7ebe9, var(--bg-subtle));
+  background: linear-gradient(90deg, var(--bg-subtle), #221f29, var(--bg-subtle));
   background-size: 200% 100%;
   animation: skel 1.4s ease-in-out infinite;
 }
@@ -523,10 +523,10 @@
   transition: width var(--dur-slow) var(--ease-out);
 }
 .meter--ok span {
-  background: var(--jade-400);
+  background: var(--violet-400);
 }
 .meter--warn span {
-  background: #d99a2b;
+  background: var(--warning);
 }
 .meter--bad span {
   background: var(--danger);
@@ -568,25 +568,26 @@
   object-fit: cover;
   background: var(--bg-subtle);
 }
+/* Initials avatars: five quiet tints from the palette. */
 .tok--0 {
-  background: var(--jade-100);
-  color: var(--jade-800);
+  background: rgba(215, 173, 255, 0.16);
+  color: var(--violet-100);
 }
 .tok--1 {
-  background: #e3ecf7;
-  color: #28476e;
+  background: rgba(182, 0, 255, 0.2);
+  color: var(--violet-200);
 }
 .tok--2 {
-  background: #f3ecdf;
-  color: #6b4d1c;
+  background: rgba(245, 243, 250, 0.1);
+  color: var(--fg1);
 }
 .tok--3 {
-  background: #ece6f4;
-  color: #4b3673;
+  background: rgba(170, 165, 181, 0.16);
+  color: var(--fg2);
 }
 .tok--4 {
-  background: var(--ink-100);
-  color: var(--ink-600);
+  background: var(--bg-subtle);
+  color: var(--fg2);
 }
 
 /* ---------------------------------------------------------------- rows (activity) */
@@ -617,8 +618,8 @@
   place-items: center;
 }
 .row-ico--in {
-  background: rgba(15, 174, 128, 0.12);
-  color: var(--jade-700);
+  background: var(--success-soft);
+  color: var(--success);
 }
 .row-ico--out {
   background: var(--bg-subtle);
@@ -658,7 +659,7 @@
   white-space: nowrap;
 }
 .amt--in {
-  color: var(--jade-700);
+  color: var(--success);
 }
 .row--auth {
   flex-direction: column;
@@ -786,7 +787,7 @@
   padding: 14px 16px;
   border-radius: var(--radius-md);
   background: var(--ink-900);
-  color: var(--jade-200);
+  color: var(--violet-200);
   overflow-x: auto;
 }
 code {
@@ -954,7 +955,7 @@ code {
   background: var(--ink-900);
   color: var(--white);
   box-shadow: var(--shadow-lg);
-  border-left: 3px solid var(--jade-400);
+  border-left: 3px solid var(--violet-400);
   animation: toastIn 260ms var(--ease-out);
 }
 .toast--bad {
@@ -976,7 +977,7 @@ code {
   display: inline-block;
   margin-top: 6px;
   font-size: 13px;
-  color: var(--jade-300);
+  color: var(--violet-300);
 }
 .toast .icon-btn {
   color: var(--ink-300);
@@ -1038,7 +1039,7 @@ code {
   text-align: center;
 }
 .gate-inner .ds-label {
-  color: var(--jade-100);
+  color: var(--violet-100);
   margin-bottom: 20px;
 }
 .gate-inner h1 {
@@ -1134,7 +1135,7 @@ code {
   gap: 10px;
 }
 .ov-hero .ds-label {
-  color: var(--jade-100);
+  color: var(--violet-100);
   font-size: 11px;
 }
 .hero-chip {
@@ -1174,7 +1175,7 @@ code {
   gap: 8px;
   padding: 5px 12px 5px 5px;
   border-radius: var(--radius-pill);
-  background: rgba(3, 46, 35, 0.28);
+  background: rgba(5, 5, 7, 0.28);
   border: 1px solid rgba(255, 255, 255, 0.16);
   color: var(--white);
   font-size: 13.5px;
@@ -1233,7 +1234,7 @@ code {
 .onboard-steps li.done {
   background: var(--accent-tint);
   border-color: transparent;
-  color: var(--jade-800);
+  color: var(--violet-100);
 }
 .onboard-steps li.done svg {
   color: var(--accent);
@@ -1399,13 +1400,13 @@ code {
   margin-top: 2px;
 }
 .check--block {
-  color: #b12f2f;
+  color: var(--danger);
 }
 .check--warn {
-  color: #97580a;
+  color: var(--warning);
 }
 .check--ok {
-  color: var(--jade-700);
+  color: var(--success);
 }
 
 .progress-card {
@@ -1480,8 +1481,8 @@ code {
   gap: 20px;
   align-items: start;
 }
-/* PrivaBank card: standard ID-1 proportions (85.6 x 54 mm = 1.586), dark
-   vault face with the jade light of the site panels. */
+/* Spectral card: standard ID-1 proportions (85.6 x 54 mm = 1.586), dark
+   vault face with the violet light of the site panels. */
 .cred-card-col {
   min-width: 0;
 }
@@ -1510,12 +1511,12 @@ code {
   -webkit-backface-visibility: hidden;
   color: var(--white);
   background:
-    radial-gradient(120% 90% at 100% 0%, rgba(32, 205, 153, 0.38), transparent 55%),
-    radial-gradient(90% 70% at 0% 100%, rgba(11, 138, 102, 0.35), transparent 60%),
-    linear-gradient(150deg, #10201b, var(--ink-900) 58%, #032a20);
+    radial-gradient(120% 90% at 100% 0%, rgba(182, 0, 255, 0.42), transparent 55%),
+    radial-gradient(90% 70% at 0% 100%, rgba(215, 173, 255, 0.22), transparent 60%),
+    linear-gradient(150deg, #1a0b26, var(--ink-900) 58%, #14001f);
   box-shadow:
-    0 24px 48px rgba(7, 16, 13, 0.22),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    0 24px 48px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(245, 243, 250, 0.1);
 }
 .bcard-front {
   padding: 7% 7.5% 6.5%;
@@ -1528,7 +1529,7 @@ code {
   width: 70%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(143, 242, 208, 0.18), transparent 65%);
+  background: radial-gradient(circle, rgba(215, 173, 255, 0.18), transparent 65%);
   pointer-events: none;
 }
 .bcard-dots {
@@ -1564,7 +1565,7 @@ code {
   fill: var(--white);
 }
 .bcard-word .wm-b {
-  fill: var(--jade-300);
+  fill: var(--violet-300);
 }
 .bcard-nfc {
   transform: rotate(90deg);
@@ -1576,14 +1577,14 @@ code {
   width: 15%;
   aspect-ratio: 1.3;
   border-radius: 6px;
-  background: linear-gradient(135deg, #d9e6e1, #9fb8af 45%, #e8f1ee 70%, #a8bfb7);
+  background: linear-gradient(135deg, #e4dfee, #aba5b8 45%, #f1eef6 70%, #b5afc2);
   display: grid;
   grid-template-rows: repeat(3, 1fr);
   padding: 3px 0;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
 }
 .bcard-chip span {
-  border-top: 1px solid rgba(40, 60, 54, 0.35);
+  border-top: 1px solid rgba(60, 52, 70, 0.35);
 }
 .bcard-chip span:first-child {
   border-top: 0;
@@ -1683,7 +1684,7 @@ img.bcard-net {
   align-items: center;
   padding: 0 12px;
   border-radius: 4px;
-  background: repeating-linear-gradient(135deg, #eef3f1 0 6px, #e0e8e5 6px 12px);
+  background: repeating-linear-gradient(135deg, #f3f1f7 0 6px, #e7e3ee 6px 12px);
   color: var(--ink-700);
   font-family: var(--font-serif);
   font-style: italic;
@@ -1879,11 +1880,11 @@ img.bcard-net {
 }
 .verify-result.ok {
   background: var(--accent-tint);
-  border-color: rgba(11, 138, 102, 0.24);
+  border-color: rgba(215, 173, 255, 0.24);
 }
 .verify-result.bad {
-  background: #fff3f3;
-  border-color: rgba(216, 58, 58, 0.28);
+  background: var(--danger-soft);
+  border-color: rgba(255, 122, 133, 0.3);
 }
 .verify-result > * + * {
   margin-top: 10px;
@@ -1895,10 +1896,10 @@ img.bcard-net {
   flex-wrap: wrap;
 }
 .verify-result.ok .verify-head {
-  color: var(--jade-800);
+  color: var(--success);
 }
 .verify-result.bad .verify-head {
-  color: #9c2828;
+  color: var(--danger);
 }
 .verify-head strong {
   font-weight: 500;
@@ -1986,10 +1987,10 @@ img.bcard-net {
 .compare-was {
   color: var(--fg3);
   text-decoration: line-through;
-  text-decoration-color: rgba(216, 58, 58, 0.5);
+  text-decoration-color: rgba(255, 122, 133, 0.5);
 }
 .compare-now {
-  color: var(--jade-800);
+  color: var(--accent);
 }
 
 /* ---------------------------------------------------------------- token + settings */
@@ -2075,7 +2076,7 @@ img.bcard-net {
     position: fixed;
     inset: 0;
     z-index: 150;
-    background: rgba(7, 9, 10, 0.4);
+    background: rgba(5, 5, 7, 0.4);
     opacity: 0;
     pointer-events: none;
     transition: opacity var(--dur) var(--ease-out);

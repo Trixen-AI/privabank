@@ -231,7 +231,7 @@ export default function Pay() {
               </Link>
             }
           >
-            Every PrivaBank payment is authorized with your credential. Issuing it takes one signature and doesn't move funds.
+            Every Spectral payment is authorized with your credential. Issuing it takes one signature and doesn't move funds.
           </Empty>
         </Card>
       </>

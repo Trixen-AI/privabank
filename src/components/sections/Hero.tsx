@@ -7,12 +7,14 @@ import tetherLogo from "../../assets/brands/tether.svg";
 
 /**
  * Third-party marks, official SVG files, used unmodified and only to name the
- * networks and assets PrivaBank settles on. Sources:
+ * networks and assets Spectral settles on. Sources:
  *   Robinhood https://commons.wikimedia.org/wiki/File:Robinhood_logo.svg
  *             (robinhood.com's press kit was unreachable from the build machine;
  *              swap in the press-kit file if you have it)
  *   USDC    https://www.circle.com/pressroom (brand kit) -> Lockup/USDC Lockup.svg
  *   Tether  https://tether.to/en/media/ -> /images/logoGreen.svg
+ * On the dark site they render as their reversed one-colour (white) variants;
+ * see .logo-cell img in components.css.
  */
 const RAIL_LOGOS = [
   { src: robinhoodLogo, alt: "Robinhood", height: 22 },

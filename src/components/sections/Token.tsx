@@ -34,7 +34,7 @@ export function Token() {
             </div>
 
             <div className="token-nav">
-              <div className="token-tabs" role="tablist" aria-label="$PRIVA utility">
+              <div className="token-tabs" role="tablist" aria-label="$SPECTRAL utility">
                 {TOKEN.tabs.map((t, i) => (
                   <button
                     key={t.idx}

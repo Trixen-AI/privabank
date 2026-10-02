@@ -9,7 +9,7 @@ function GateFrame({ children }: { children: React.ReactNode }) {
   return (
     <div className="gate">
       <header className="gate-top">
-        <Link to="/" className="brand" aria-label="PrivaBank home">
+        <Link to="/" className="brand" aria-label="Spectral home">
           <Logo />
         </Link>
         <Link to="/" className="gate-back">
@@ -34,7 +34,7 @@ export function ConnectGate({ onConnect, connecting }: { onConnect: () => void; 
         <div className="panel__dots" />
         <div className="panel__glow" />
         <div className="panel__inner gate-inner">
-          <span className="ds-label">PrivaBank app</span>
+          <span className="ds-label">Spectral app</span>
           <h1>
             Open your <span className="hl">private account.</span>
           </h1>

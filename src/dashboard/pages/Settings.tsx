@@ -125,7 +125,7 @@ export default function Settings() {
         )}
       </Card>
 
-      <Card label="Stored on this device" title="Your PrivaBank data">
+      <Card label="Stored on this device" title="Your Spectral data">
         <p className="muted">
           Credential ID, spending rules, authorizations and reports live in this browser only, per address. Back them up before
           clearing site data or switching devices.
@@ -154,7 +154,7 @@ export default function Settings() {
             className="btn btn-sec"
             onClick={() =>
               download(
-                `privabank-backup-${w.address?.slice(0, 8)}-${new Date().toISOString().slice(0, 10)}.json`,
+                `spectral-backup-${w.address?.slice(0, 8)}-${new Date().toISOString().slice(0, 10)}.json`,
                 JSON.stringify({ ...data, holder: w.address }, null, 2),
                 "application/json",
               )
@@ -192,7 +192,7 @@ export default function Settings() {
       </Card>
 
       <p className="muted small settings-foot">
-        PrivaBank app · <Link to="/">Website</Link> · Networks: Robinhood Chain and Ethereum.
+        Spectral app · <Link to="/">Website</Link> · Networks: Robinhood Chain and Ethereum.
       </p>
     </>
   );

@@ -20,7 +20,7 @@ export function PoolScene() {
         const depth = (y - surfaceY) / (h - surfaceY);
         const shimmer = 0.5 + 0.5 * Math.sin(t * 1.1 + x * 0.045 + y * 0.03);
         const a = (0.1 + shimmer * 0.2) * (1 - depth * 0.45);
-        ctx.fillStyle = `rgba(78, 227, 180, ${a.toFixed(3)})`;
+        ctx.fillStyle = `rgba(215, 173, 255, ${a.toFixed(3)})`;
         ctx.beginPath();
         ctx.arc(x, y, 1.35, 0, Math.PI * 2);
         ctx.fill();
@@ -29,9 +29,9 @@ export function PoolScene() {
 
     // --- the surface of the pool ---
     const grad = ctx.createLinearGradient(0, surfaceY - 30, 0, surfaceY + 30);
-    grad.addColorStop(0, "rgba(78,227,180,0)");
-    grad.addColorStop(0.5, "rgba(78,227,180,0.42)");
-    grad.addColorStop(1, "rgba(78,227,180,0)");
+    grad.addColorStop(0, "rgba(215, 173, 255,0)");
+    grad.addColorStop(0.5, "rgba(215, 173, 255,0.42)");
+    grad.addColorStop(1, "rgba(215, 173, 255,0)");
     ctx.fillStyle = grad;
     ctx.fillRect(0, surfaceY - 30, w, 60);
 
@@ -45,7 +45,7 @@ export function PoolScene() {
       if (y > surfaceY) {
         // landed: a ripple spreading out from the entry point
         const age = (y - surfaceY) / 30;
-        ctx.strokeStyle = `rgba(194,251,232,${(0.5 * (1 - age)).toFixed(3)})`;
+        ctx.strokeStyle = `rgba(238, 223, 255,${(0.5 * (1 - age)).toFixed(3)})`;
         ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.ellipse(x, surfaceY, 12 + age * 46, 4 + age * 13, 0, 0, Math.PI * 2);
@@ -58,14 +58,14 @@ export function PoolScene() {
       ctx.globalAlpha = 0.85 * fade;
       ctx.translate(x, y);
       ctx.rotate(Math.sin(t * 0.9 + i) * 0.16);
-      ctx.fillStyle = "rgba(11,138,102,0.5)";
-      ctx.strokeStyle = "rgba(143,242,208,0.85)";
+      ctx.fillStyle = "rgba(182, 0, 255,0.5)";
+      ctx.strokeStyle = "rgba(227, 199, 255,0.85)";
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.roundRect(-13, -8, 26, 16, 3);
       ctx.fill();
       ctx.stroke();
-      ctx.fillStyle = "rgba(194,251,232,0.75)";
+      ctx.fillStyle = "rgba(238, 223, 255,0.75)";
       ctx.fillRect(-8, -2.5, 8 + ((i * 3) % 7), 2);
       ctx.restore();
     }
@@ -80,7 +80,7 @@ export function PoolScene() {
  * Original Canvas 2D drawing. A dense dot field carries a travelling band of
  * light from left to right: the verification pass moving through the ledger.
  * Ahead of the band the dots are dim and undifferentiated, behind it they settle
- * to a steady, cleared jade. Privacy going in, clean settlement coming out.
+ * to a steady, cleared lilac. Privacy going in, clean settlement coming out.
  */
 export function SettlementScene() {
   const ref = useCanvas((ctx, t, w, h) => {
@@ -108,8 +108,8 @@ export function SettlementScene() {
 
         ctx.fillStyle =
           inBand > 0.25
-            ? `rgba(194,251,232,${Math.min(1, alpha).toFixed(3)})`
-            : `rgba(32,205,153,${Math.min(1, alpha).toFixed(3)})`;
+            ? `rgba(238, 223, 255,${Math.min(1, alpha).toFixed(3)})`
+            : `rgba(197, 124, 255,${Math.min(1, alpha).toFixed(3)})`;
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, Math.PI * 2);
         ctx.fill();
@@ -118,9 +118,9 @@ export function SettlementScene() {
 
     // the leading edge of the pass
     const edge = ctx.createLinearGradient(sweepX - 90, 0, sweepX + 30, 0);
-    edge.addColorStop(0, "rgba(78,227,180,0)");
-    edge.addColorStop(0.75, "rgba(78,227,180,0.16)");
-    edge.addColorStop(1, "rgba(78,227,180,0)");
+    edge.addColorStop(0, "rgba(215, 173, 255,0)");
+    edge.addColorStop(0.75, "rgba(215, 173, 255,0.16)");
+    edge.addColorStop(1, "rgba(215, 173, 255,0)");
     ctx.fillStyle = edge;
     ctx.fillRect(sweepX - 90, 0, 120, h);
   });
@@ -132,37 +132,35 @@ export function SettlementScene() {
   );
 }
 
-/* The PrivaBank mark (keyhole P + detached chip) as a point-in-shape test, so
-   the dot matrix can render it at any resolution without an image file.
-   Coordinates match MARK_P / MARK_KEYHOLE / MARK_CHIP in ui/Logo.tsx. */
-function inRoundRect(x: number, y: number, x0: number, y0: number, x1: number, y1: number, r: number) {
-  if (x < x0 || x > x1 || y < y0 || y > y1) return false;
-  const cx = Math.min(Math.max(x, x0 + r), x1 - r);
-  const cy = Math.min(Math.max(y, y0 + r), y1 - r);
-  return (x - cx) ** 2 + (y - cy) ** 2 <= r * r;
-}
+/* The Spectral mark (the S band) as a point-in-shape test, so the dot matrix
+   can render it at any resolution without an image file. Same geometry as
+   MARK_S in ui/Logo.tsx: three straight runs joined by two half circles of
+   radius 9, drawn 16 wide, so a point is "on" within 8 units of that path. */
+const segDist = (x: number, y: number, x0: number, y0: number, x1: number, y1: number) => {
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  const t = Math.max(0, Math.min(1, ((x - x0) * dx + (y - y0) * dy) / (dx * dx + dy * dy)));
+  return Math.hypot(x - (x0 + t * dx), y - (y0 + t * dy));
+};
 
 function markAlpha(u: number, v: number) {
   const x = u * 64;
   const y = v * 64;
-  // chip
-  if (inRoundRect(x, y, 34, 43, 48, 54, 3.5)) return 1;
-  // stem
-  const inStem = inRoundRect(x, y, 14, 10, 26, 54, 5);
-  // bowl: flat left edge, semicircle right edge (centre 36,24 r14)
-  const inBowl = y >= 10 && y <= 38 && x >= 19 && (x <= 36 || (x - 36) ** 2 + (y - 24) ** 2 <= 196);
-  if (!inStem && !inBowl) return 0;
-  // keyhole cut: circle (38, 21.5) r4.6 plus tapered slot to y 32.5
-  if ((x - 38) ** 2 + (y - 21.5) ** 2 < 21.16) return 0;
-  if (y > 25 && y < 32.5 && Math.abs(x - 38) < 2.1 - ((y - 25) / 7.5) * 0.6) return 0;
-  return 1;
+  const d = Math.min(
+    segDist(x, y, 46, 14, 25, 14),
+    x <= 25 ? Math.abs(Math.hypot(x - 25, y - 23) - 9) : Infinity, // left turn, centre (25, 23)
+    segDist(x, y, 25, 32, 39, 32),
+    x >= 39 ? Math.abs(Math.hypot(x - 39, y - 41) - 9) : Infinity, // right turn, centre (39, 41)
+    segDist(x, y, 39, 50, 18, 50),
+  );
+  return d <= 8 ? 1 : 0;
 }
 
 /**
  * Dot-matrix panel background (token section).
  *
  * Original Canvas 2D renderer. Dots on a fixed grid grow and brighten where the
- * PrivaBank mark sits, and a ripple travels outward from the mark so the
+ * Spectral mark sits, and a ripple travels outward from the mark so the
  * silhouette keeps breathing. The mark is evaluated geometrically, so there is
  * no bitmap behind it.
  */

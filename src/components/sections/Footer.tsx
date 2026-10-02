@@ -5,26 +5,18 @@ import { Logomark, Wordmark } from "../ui/Logo";
 
 
 /**
- * X publishes no freely downloadable official SVG (its brand toolkit is gated),
- * and the rule is never to redraw a brand mark from memory. Until the file is
- * supplied, the X link carries a neutral bordered mark with the platform letter,
- * not a reproduction of the X logo.
+ * Official X logo, unmodified path from X's brand toolkit
+ * (https://about.x.com/content/dam/about-twitter/x/brand-toolkit/x-logo.zip, logo.svg,
+ * stored byte-for-byte in src/assets/social/x.svg). The kit ships it in black and
+ * white; currentColor picks whichever the footer needs.
  */
-function NeutralMark({ letter }: { letter: string }) {
+function XLogo() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <text
-        x="12"
-        y="16.4"
-        textAnchor="middle"
+    <svg viewBox="0 0 1200 1227" aria-hidden="true">
+      <path
         fill="currentColor"
-        fontFamily="inherit"
-        fontSize="11"
-        fontWeight="600"
-      >
-        {letter}
-      </text>
+        d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"
+      />
     </svg>
   );
 }
@@ -101,11 +93,11 @@ export function Footer() {
           ))}
 
           <div className="footer-col">
-            <h4>Follow PrivaBank</h4>
+            <h4>Follow Spectral</h4>
             <div className="socials">
               {SOCIALS.map((s) => (
                 <a key={s.key} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>
-                  <NeutralMark letter="X" />
+                  <XLogo />
                 </a>
               ))}
             </div>

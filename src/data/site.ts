@@ -1,12 +1,12 @@
 /**
- * All PrivaBank copy lives here so it can be edited in one place.
+ * All Spectral copy lives here so it can be edited in one place.
  * House style: short declaratives, banking nouns, no em dashes.
  */
 
 export const BRAND = {
-  name: "PrivaBank",
-  legal: "PrivaBank Protocol",
-  ticker: "$PRIVA",
+  name: "Spectral",
+  legal: "Spectral Protocol",
+  ticker: "$SPECTRAL",
   tagline: "Privacy as infrastructure for onchain money.",
   year: 2026,
 };
@@ -90,7 +90,7 @@ export const NAV = {
       },
       {
         title: "Brand",
-        desc: "Logo files, colour values, and how to write about PrivaBank.",
+        desc: "Logo files, colour values, and how to write about Spectral.",
         href: "#footer",
         icon: "palette",
       },
@@ -119,7 +119,7 @@ export const NAV = {
       },
       {
         title: "Run a relayer",
-        desc: "Process proofs, earn $PRIVA, and widen the anonymity set.",
+        desc: "Process proofs, earn $SPECTRAL, and widen the anonymity set.",
         href: "#build",
         icon: "server",
         soon: true,
@@ -132,7 +132,7 @@ export const NAV = {
 /* ---------------------------------------------------------------- HERO */
 
 export const HERO = {
-  pill: { flag: "New", text: "Priva Protocol whitepaper", href: "#papers" },
+  pill: { flag: "New", text: "Spectral Protocol whitepaper", href: "#papers" },
   labelPrefix: "The authorization-based",
   labelWords: ["payments", "banking", "credentials", "settlement", "compliance", "identity"],
   labelSuffix: "network",
@@ -140,14 +140,14 @@ export const HERO = {
   h1b: "Infrastructure.",
   sub: "The first privacy-first, authorization-based onchain neobank. Users prove permission to spend, not ownership of funds. No public balances. No wallet addresses. Just compliant, private payments.",
   ctaPrimary: { label: "Get credentials", href: "/app/credential" },
-  ctaSecondary: { label: "Buy $PRIVA", href: "#token" },
-  note: "PrivaBank replaces public wallets with Zero-Knowledge Login credentials. Authenticate without exposing your IP or your identity.",
+  ctaSecondary: { label: "Buy $SPECTRAL", href: "#token" },
+  note: "Spectral replaces public wallets with Zero-Knowledge Login credentials. Authenticate without exposing your IP or your identity.",
   noteLink: { label: "Read the whitepaper", href: "#papers" },
   spec: [
     { k: "Current version", v: "v0.1.0" },
     { k: "Network", v: "Ethereum / Robinhood Chain" },
     { k: "Status", v: "Live" },
-    { k: "Powered by", v: "Priva Protocol" },
+    { k: "Powered by", v: "Spectral Protocol" },
   ],
 };
 
@@ -161,7 +161,7 @@ export const PARADIGM = {
   label: "The paradigm shift",
   h2a: "From glass houses to ",
   h2b: "steel vaults.",
-  lead: "Most chains treat privacy as a feature you bolt on later. PrivaBank treats it as the floor the rest of the bank stands on.",
+  lead: "Most chains treat privacy as a feature you bolt on later. Spectral treats it as the floor the rest of the bank stands on.",
   cards: {
     problem: {
       title: "Transparent chains",
@@ -187,7 +187,7 @@ export const PARADIGM = {
     bank: {
       title: "Private neobanking",
       body: "Hold funds, spend at merchants, and receive payouts with the convenience of a bank account and the discretion of cash. Nothing about the account is legible from outside it.",
-      link: "Open a PrivaBank account",
+      link: "Open a Spectral account",
     },
   },
 };
@@ -218,7 +218,7 @@ export const PILLARS = {
   label: "Three pillars",
   h2a: "Sovereignty without ",
   h2b: "complexity.",
-  lead: "A PrivaBank account has no seed phrase to lose and no address to leak. Three pieces of infrastructure carry the whole experience.",
+  lead: "A Spectral account has no seed phrase to lose and no address to leak. Three pieces of infrastructure carry the whole experience.",
   items: [
     {
       icon: "fingerprint",
@@ -320,17 +320,17 @@ export const PAPERS = {
   lead: "Everything that makes authorization-based banking work is written down, specified, and open to review before you trust a cent to it.",
   items: [
     {
-      name: "Priva",
+      name: "Spectral",
       sub: "Authorization-Based Banking on a Shielded Pool",
       rest: "The protocol paper: credentials, notes, proofs, and settlement",
-      date: "September 2026",
+      date: "October 2026",
       variant: "jade" as const,
     },
     {
       name: "Warden",
       sub: "Compliance Without Disclosure",
       rest: "Spending limits, merchant allowlists, and audit reports under zero knowledge",
-      date: "September 2026",
+      date: "October 2026",
       variant: "dark" as const,
     },
   ],
@@ -342,10 +342,10 @@ export const PAPERS = {
 export const TOKEN = {
   label: "Token",
   h2a: "Powered by ",
-  h2b: "$PRIVA.",
-  lead: "$PRIVA pays the people who keep the anonymity set wide and the proofs verified. Real payment volume becomes real demand for the token, and the operators who carry the load are the ones who earn from it.",
+  h2b: "$SPECTRAL.",
+  lead: "$SPECTRAL pays the people who keep the anonymity set wide and the proofs verified. Real payment volume becomes real demand for the token, and the operators who carry the load are the ones who earn from it.",
   buttons: [
-    { label: "$PRIVA token", href: "#token", icon: "coins", primary: true },
+    { label: "$SPECTRAL token", href: "#token", icon: "coins", primary: true },
     { label: "View tokenomics", href: "#token", icon: "chart-pie", primary: false },
   ],
   tabs: [
@@ -353,9 +353,9 @@ export const TOKEN = {
       idx: "01",
       tab: "Relayer Incentives",
       title: "Relayers earn for every proof they carry",
-      body: "Operators collect $PRIVA fees for verifying zero-knowledge proofs and submitting transactions. The more relayers run, the wider the anonymity set gets for everyone in the pool.",
+      body: "Operators collect $SPECTRAL fees for verifying zero-knowledge proofs and submitting transactions. The more relayers run, the wider the anonymity set gets for everyone in the pool.",
       figs: [
-        { v: "1,240", k: "$PRIVA earned / relayer / week" },
+        { v: "1,240", k: "$SPECTRAL earned / relayer / week" },
         { v: "+12.5%", k: "Reward rate, 30d" },
       ],
     },
@@ -372,8 +372,8 @@ export const TOKEN = {
     {
       idx: "03",
       tab: "Fee Shielding",
-      title: "Pay fees in $PRIVA at a discount",
-      body: "Settling transaction fees in $PRIVA takes 25 percent off and decouples your stablecoin balance from gas entirely. Your spending balance stays a spending balance.",
+      title: "Pay fees in $SPECTRAL at a discount",
+      body: "Settling transaction fees in $SPECTRAL takes 25 percent off and decouples your stablecoin balance from gas entirely. Your spending balance stays a spending balance.",
       figs: [
         { v: "-25%", k: "Fee discount" },
         { v: "0", k: "Stablecoin gas spent" },
@@ -415,7 +415,7 @@ export const ROADMAP = {
     {
       k: "03. Growth",
       title: "Growth",
-      body: "The $PRIVA launch, a permissionless relayer set, and shielded settlement beyond a single chain.",
+      body: "The $SPECTRAL launch, a permissionless relayer set, and shielded settlement beyond a single chain.",
       done: false,
     },
     {
@@ -452,7 +452,7 @@ export const CTA: {
 } = {
   h2a: "Driving the next generation of ",
   h2b: "wealth.",
-  sub: "PrivaBank is built for people who want financial privacy without giving up the things that make a bank useful. Create your credentials and start moving money quietly.",
+  sub: "Spectral is built for people who want financial privacy without giving up the things that make a bank useful. Create your credentials and start moving money quietly.",
   tiles: ["shield-check", "key-round", "fingerprint", "banknote", "lock", "receipt"],
   boxes: [
     {
@@ -464,7 +464,7 @@ export const CTA: {
     },
     {
       label: "Build",
-      title: "Build on PrivaBank",
+      title: "Build on Spectral",
       body: "Add private balances and proof-based payments to your own product with the TypeScript SDK.",
       visual: "code",
       buttons: [
@@ -475,11 +475,11 @@ export const CTA: {
     {
       label: "Network",
       title: "Run a relayer",
-      body: "Verify proofs, pay gas on behalf of users, and earn $PRIVA for widening the anonymity set.",
+      body: "Verify proofs, pay gas on behalf of users, and earn $SPECTRAL for widening the anonymity set.",
       visual: "relayer",
       buttons: [
         { label: "Run a relayer", href: "#build", primary: false, soon: true },
-        { label: "Buy $PRIVA", href: "#token", primary: false },
+        { label: "Buy $SPECTRAL", href: "#token", primary: false },
       ],
     },
   ],
@@ -503,7 +503,7 @@ export const CTA: {
   relayer: [
     { k: "Proofs relayed", v: "18,240 / 24h" },
     { k: "Median latency", v: "34 ms" },
-    { k: "Fees earned", v: "1,240 $PRIVA" },
+    { k: "Fees earned", v: "1,240 $SPECTRAL" },
     { k: "Uptime", v: "99.98%" },
   ],
 };
@@ -516,8 +516,8 @@ export const FAQ = {
   h2b: "questions.",
   items: [
     {
-      q: "What is PrivaBank?",
-      a: "PrivaBank is an onchain neobank built on authorization rather than ownership. Instead of a public wallet holding a public balance, you hold a zero-knowledge credential that proves you are allowed to spend. Funds live in a shielded pool, payments are routed by relayers, and merchants are paid in ordinary stablecoins.",
+      q: "What is Spectral?",
+      a: "Spectral is an onchain neobank built on authorization rather than ownership. Instead of a public wallet holding a public balance, you hold a zero-knowledge credential that proves you are allowed to spend. Funds live in a shielded pool, payments are routed by relayers, and merchants are paid in ordinary stablecoins.",
     },
     {
       q: "If there is no wallet address, how do I hold money?",
@@ -533,10 +533,10 @@ export const FAQ = {
     },
     {
       q: "Who pays the gas?",
-      a: "Relayers do. They accept your proof, cover the network fee, and submit the transaction. That is what keeps your own addresses off the chain entirely, and it is what relayers earn $PRIVA for.",
+      a: "Relayers do. They accept your proof, cover the network fee, and submit the transaction. That is what keeps your own addresses off the chain entirely, and it is what relayers earn $SPECTRAL for.",
     },
     {
-      q: "What is $PRIVA for?",
+      q: "What is $SPECTRAL for?",
       a: "Three things: it pays relayers for verifying proofs, it gives holders the vote over verification keys, spending limits, and compliance policy, and it can be spent on transaction fees at a 25 percent discount so your stablecoin balance stays untouched by gas.",
     },
     {
@@ -560,7 +560,7 @@ export const FOOTER = {
   },
   app: {
     label: "Get the app",
-    body: "Download the PrivaBank app on your mobile device.",
+    body: "Download the Spectral app on your mobile device.",
     badge: "Coming soon",
   },
   columns: [
@@ -572,7 +572,7 @@ export const FOOTER = {
         { label: "Shielded Pools", href: "#network" },
         { label: "Proof-Based Authorization", href: "/app/pay" },
         { label: "Relayer Network", href: "#layers" },
-        { label: "$PRIVA Token", href: "#token" },
+        { label: "$SPECTRAL Token", href: "#token" },
       ],
     },
     {
@@ -587,7 +587,7 @@ export const FOOTER = {
     {
       head: "Company",
       links: [
-        { label: "About PrivaBank", href: "#paradigm" },
+        { label: "About Spectral", href: "#paradigm" },
         { label: "Brand assets", href: "#footer" },
         { label: "Careers", href: "#footer" },
       ],
@@ -608,5 +608,5 @@ export const FOOTER = {
   ],
 };
 
-/** Social accounts. Add more entries here if PrivaBank opens other profiles. */
-export const SOCIALS = [{ key: "x", label: "PrivaBank on X", href: "https://x.com/PrivaBank" }];
+/** Social accounts. Add more entries here if Spectral opens other profiles. */
+export const SOCIALS = [{ key: "x", label: "Spectral on X", href: "https://x.com/SpectralPay" }];

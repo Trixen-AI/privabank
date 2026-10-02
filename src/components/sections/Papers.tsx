@@ -1,8 +1,8 @@
 import { PAPERS } from "../../data/site";
 import { SmartLink } from "../ui/SmartLink";
-import { DotField, PaperMarkPriva, PaperMarkWarden } from "../ui/Art";
+import { DotField, PaperMarkSpectral, PaperMarkWarden } from "../ui/Art";
 
-const MARKS = [PaperMarkPriva, PaperMarkWarden];
+const MARKS = [PaperMarkSpectral, PaperMarkWarden];
 
 export function Papers() {
   return (

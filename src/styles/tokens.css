@@ -1,79 +1,85 @@
-/* PrivaBank design tokens.
+/* Spectral design tokens.
    Role structure mirrors the reference layout system (scale, spacing, radii,
-   shadows, easing); every value is PrivaBank's own. Accent is "authorization
-   jade": the colour of permission granted. */
+   shadows, easing). Colour follows the GhostCard palette: an ink canvas, carbon
+   surfaces on graphite hairlines, chalk type, ash for secondary text. Lilac is
+   the one action colour; violet appears only as a thin signal (rules, status,
+   the spine of the mark). */
 
 :root {
-  /* Brand ramp */
-  --jade-50: #e6fff6;
-  --jade-100: #c2fbe8;
-  --jade-200: #8bf2d0;
-  --jade-300: #4ee3b4;
-  --jade-400: #20cd99;
-  --jade-500: #0fae80;
-  --jade-600: #0b8a66;
-  --jade-700: #086a4f;
-  --jade-800: #054b39;
-  --jade-900: #032e23;
+  /* Brand ramp: 300 is GhostCard lilac, 500 is GhostCard violet */
+  --violet-50: #f7efff;
+  --violet-100: #eedfff;
+  --violet-200: #e3c7ff;
+  --violet-300: #d7adff;
+  --violet-400: #c57cff;
+  --violet-500: #b600ff;
+  --violet-600: #9200cc;
+  --violet-700: #6d0099;
+  --violet-800: #470066;
+  --violet-900: #26003a;
 
-  --primary: #0b8a66;
-  --primary-hover: #0a7857;
-  --primary-press: #086a4f;
-  --primary-tint: #e6fff6;
+  --primary: #d7adff;
+  --primary-hover: #f5f3fa;
+  --primary-press: #aaa5b5;
+  --primary-tint: rgba(215, 173, 255, 0.1);
 
-  /* Ink ramp (cool neutral) */
+  /* Neutral ramp (violet-tinted, from ink to chalk) */
   --black: #000000;
-  --ink-900: #07090a;
-  --ink-800: #0e1113;
-  --ink-700: #161a1c;
-  --ink-600: #222729;
-  --ink-500: #363c3f;
-  --ink-400: #525a5d;
-  --ink-300: #7d878a;
-  --ink-200: #b0b8ba;
-  --ink-100: #dcdedd;
-  --ink-050: #f1f3f2;
+  --ink-900: #050507;
+  --ink-800: #0b0b0f;
+  --ink-700: #111116;
+  --ink-600: #1c1a22;
+  --ink-500: #29262f;
+  --ink-400: #4a4653;
+  --ink-300: #77727f;
+  --ink-200: #aaa5b5;
+  --ink-100: #d4d0dc;
+  --ink-050: #f5f3fa;
   --white: #ffffff;
 
   /* Surfaces */
-  --bg: #ffffff;
-  --bg-raised: #f7f8f8;
-  --bg-subtle: #f1f3f2;
-  --bg-card: #ffffff;
+  --bg: #050507;
+  --bg-raised: #0b0b0f;
+  --bg-subtle: #16151b;
+  --bg-card: #111116;
 
   /* Foreground */
-  --fg1: #07090a;
-  --fg2: #525a5d;
-  --fg3: #7d878a;
-  --border: #dcdedd;
-  --border-faint: rgba(0, 0, 0, 0.08);
+  --fg1: #f5f3fa;
+  --fg2: #aaa5b5;
+  --fg3: #77727f;
+  --border: #29262f;
+  --border-faint: rgba(245, 243, 250, 0.06);
 
   /* Accent roles */
-  --accent: #0b8a66;
-  --accent-soft: rgba(11, 138, 102, 0.1);
-  --accent-tint: #e6fff6;
-  --on-accent: #ffffff;
-  --anthracite: #161a1c;
+  --accent: #d7adff;
+  --accent-soft: rgba(215, 173, 255, 0.12);
+  --accent-tint: rgba(215, 173, 255, 0.07);
+  --on-accent: #050507;
+  --signal: #b600ff;
+  --anthracite: #111116;
 
-  /* Inverted surface */
-  --invert-bg: #07090a;
-  --invert-bg-raised: #0e1113;
-  --invert-bg-card: #161a1c;
-  --invert-fg1: #ffffff;
-  --invert-fg2: #b0b8ba;
-  --invert-fg3: #7d878a;
-  --invert-border: rgba(255, 255, 255, 0.1);
+  /* Inverted surface (a step lighter than the canvas, for set-apart bands) */
+  --invert-bg: #0b0b0f;
+  --invert-bg-raised: #111116;
+  --invert-bg-card: #16151b;
+  --invert-fg1: #f5f3fa;
+  --invert-fg2: #aaa5b5;
+  --invert-fg3: #77727f;
+  --invert-border: rgba(245, 243, 250, 0.08);
 
   /* Status */
-  --success: #0fae80;
-  --warning: #c9760a;
-  --danger: #d83a3a;
-  --info: #0a7857;
+  --success: #7fe0b8;
+  --warning: #f2b45c;
+  --danger: #ff7a85;
+  --info: #d7adff;
+  --success-soft: rgba(127, 224, 184, 0.12);
+  --warning-soft: rgba(242, 180, 92, 0.12);
+  --danger-soft: rgba(255, 122, 133, 0.12);
 
   /* Category surfaces */
-  --cat-vault-bg-1: #f6faf8;
-  --cat-vault-bg-2: #e8f1ed;
-  --cat-dark-bg: #07090a;
+  --cat-vault-bg-1: #111116;
+  --cat-vault-bg-2: #16151b;
+  --cat-dark-bg: #0b0b0f;
 
   /* Type */
   --font-sans: "General Sans", -apple-system, "Helvetica Neue", Arial, sans-serif;
@@ -122,11 +128,11 @@
   --radius-pill: 999px;
 
   /* Elevation */
-  --shadow-sm: 0 1px 2px rgba(7, 16, 13, 0.06);
-  --shadow-md: 0 8px 24px rgba(7, 16, 13, 0.1);
-  --shadow-lg: 0 24px 64px rgba(7, 16, 13, 0.14);
-  --glow-jade: 0 0 0 1px rgba(15, 174, 128, 0.4), 0 0 40px rgba(15, 174, 128, 0.3);
-  --glow-jade-soft: 0 10px 40px rgba(15, 174, 128, 0.2);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.6);
+  --glow-violet: 0 0 0 1px rgba(182, 0, 255, 0.45), 0 0 40px rgba(182, 0, 255, 0.28);
+  --glow-violet-soft: 0 10px 40px rgba(182, 0, 255, 0.2);
 
   /* Motion */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);

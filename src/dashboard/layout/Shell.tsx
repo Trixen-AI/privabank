@@ -55,7 +55,7 @@ export function Shell({ children }: { children: ReactNode }) {
     <div className={`dash${drawer ? " dash--drawer" : ""}`}>
       <aside className="dash-side" aria-label="Dashboard" onClick={closeOnLink}>
         <div className="side-top">
-          <Link to="/" className="brand" aria-label="PrivaBank home">
+          <Link to="/" className="brand" aria-label="Spectral home">
             <Logo />
           </Link>
           <button type="button" className="icon-btn side-close" aria-label="Close menu" onClick={() => setDrawer(false)}>
@@ -99,7 +99,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <button type="button" className="icon-btn dash-burger" aria-label="Open menu" onClick={() => setDrawer(true)}>
             <Menu size={20} />
           </button>
-          <Link to="/app" className="brand dash-top-brand" aria-label="PrivaBank dashboard">
+          <Link to="/app" className="brand dash-top-brand" aria-label="Spectral dashboard">
             <Logo />
           </Link>
 
