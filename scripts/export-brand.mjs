@@ -23,22 +23,27 @@ const CHALK = "#F5F3FA";
 const LILAC = "#D7ADFF";
 const VIOLET = "#B600FF";
 const ASH = "#AAA5B5";
+const LILAC_TOP = "#D8A6FF";
 
-// Same geometry as MARK_S in src/components/ui/Logo.tsx: an S drawn as one
-// round-capped band (16 wide), with a 6-wide spine running down its middle.
-const S = "M46 14H25A9 9 0 0 0 25 32H39A9 9 0 0 1 39 50H18";
+// Same geometry as MARK_SHIELD / MARK_S / MARK_VIEWBOX in src/components/ui/Logo.tsx,
+// rebuilt from the supplied artwork public/brand/logo-new.jpeg (1024 grid).
+const SHIELD =
+  "M505 266.5Q512 264 519 266.5L702 329Q718 335 718 352V490C718 604 634 694 522 755Q512 760 502 755C390 694 306 604 306 490V352Q306 335 322 329Z";
+const S = "M591 394.5H476.75A52.75 52.75 0 0 0 476.75 500H546.75A52.25 52.25 0 0 1 546.75 604.5H432";
 
-/**
- * The mark on its own, in a 64x64 box. On the dark brand background the band is
- * lilac with a violet spine; on light or unknown backgrounds (favicon, the
- * transparent PNG) the band is violet with a lilac spine so it keeps its contrast.
- */
-const mark = (band = VIOLET, spine = LILAC) => `
-  <path d="${S}" fill="none" stroke="${band}" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="${S}" fill="none" stroke="${spine}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`;
+/** The mark in its own 1024 grid; wrap it in a viewBox of "256 256 512 512" to crop to the mark. */
+const markBody = (gid) => `
+  <defs><linearGradient id="${gid}" x1="0" y1="264" x2="0" y2="760" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="${LILAC_TOP}"/><stop offset="1" stop-color="${VIOLET}"/>
+  </linearGradient></defs>
+  <path d="${SHIELD}" fill="url(#${gid})"/>
+  <path d="${S}" fill="none" stroke="${INK}" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>`;
+
+/** The mark scaled into a 64x64 box (for the lockup and the OG image). */
+const mark = (gid = "m") => `<g transform="scale(0.125) translate(-256 -256)">${markBody(gid)}</g>`;
 
 /* ---- favicon: the mark alone ---- */
-const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">${mark()}</svg>`;
+const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="256 256 512 512">${markBody("f")}</svg>`;
 writeFileSync(`${OUT}/favicon.svg`, faviconSvg);
 // Also at the root path some browsers and crawlers request directly.
 writeFileSync("public/favicon.svg", faviconSvg);
@@ -54,7 +59,7 @@ const wmW = vbW * scale;
 const GAP = 10;
 const totalW = MARK_H + GAP + wmW;
 const logo = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalW.toFixed(2)} ${MARK_H}" width="${totalW.toFixed(0)}" height="${MARK_H}">
-  <g transform="scale(${(MARK_H / 64).toFixed(5)})">${mark()}</g>
+  <g transform="scale(${(MARK_H / 64).toFixed(5)})">${mark("l")}</g>
   <g transform="translate(${(MARK_H + GAP).toFixed(2)} ${((MARK_H - WM_H) / 2 + 4).toFixed(2)}) scale(${scale.toFixed(5)}) translate(0 ${(-vbY).toFixed(2)})">
     <path d="${wmA}" fill="${INK}"/>
   </g>
@@ -62,15 +67,15 @@ const logo = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalW.toFi
 writeFileSync(`${OUT}/logo.svg`, logo);
 
 /* ---- 500x500 PNGs: mark centred with ~12% padding ---- */
-// The drawn mark spans x 10..54, y 6..58 of its 64 box (band + round caps).
+// The shield spans x 306..718, y 264..760 of the 1024 grid; centre it and fit
+// its 496-unit height into the inner 76% of the square.
 const square = (bg, size = 500) => {
-  const pad = 0.12 * size;
-  const s = (size - pad * 2) / 52;
-  const tx = size / 2 - 32 * s;
-  const ty = size / 2 - 32 * s;
+  const s = (size * 0.76) / 496;
+  const tx = size / 2 - 512 * s;
+  const ty = size / 2 - 512 * s;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     ${bg ? `<rect width="${size}" height="${size}" fill="${bg}"/>` : ""}
-    <g transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${s.toFixed(5)})">${bg ? mark(LILAC, VIOLET) : mark()}</g>
+    <g transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${s.toFixed(5)})">${markBody("q")}</g>
   </svg>`;
 };
 
@@ -97,8 +102,7 @@ const ogWmScale = ogWmH / vbH;
 const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <rect width="1200" height="630" fill="${INK}"/>
   <rect x="0" y="0" width="1200" height="1" fill="#29262F"/>
-  <rect x="96" y="250" width="44" height="3" fill="${VIOLET}"/>
-  <g transform="translate(88 70) scale(1.25)">${mark(LILAC, VIOLET)}</g>
+  <g transform="translate(88 70) scale(1.25)">${mark("o")}</g>
   <g transform="translate(180 ${70 + 40 - 22}) scale(${ogWmScale.toFixed(5)}) translate(0 ${(-vbY).toFixed(2)})">
     <path d="${wmA}" fill="${CHALK}"/>
   </g>

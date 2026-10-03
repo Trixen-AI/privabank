@@ -1,4 +1,5 @@
 import { useCanvas } from "../../hooks";
+import { MARK_S, MARK_SHIELD } from "../ui/Logo";
 
 /**
  * Shielded pool scene (dark card in the paradigm section).
@@ -132,28 +133,37 @@ export function SettlementScene() {
   );
 }
 
-/* The Spectral mark (the S band) as a point-in-shape test, so the dot matrix
-   can render it at any resolution without an image file. Same geometry as
-   MARK_S in ui/Logo.tsx: three straight runs joined by two half circles of
-   radius 9, drawn 16 wide, so a point is "on" within 8 units of that path. */
-const segDist = (x: number, y: number, x0: number, y0: number, x1: number, y1: number) => {
-  const dx = x1 - x0;
-  const dy = y1 - y0;
-  const t = Math.max(0, Math.min(1, ((x - x0) * dx + (y - y0) * dy) / (dx * dx + dy * dy)));
-  return Math.hypot(x - (x0 + t * dx), y - (y0 + t * dy));
-};
+/* The Spectral mark as a lookup mask, so the dot matrix can light it up at any
+   size without an image file: the shield is filled and the S is cut out of it,
+   from the same paths as ui/Logo.tsx, rasterised once to a small grid. */
+const MASK_SIZE = 128;
+let markMask: Uint8Array | null = null;
+
+function buildMarkMask() {
+  const c = document.createElement("canvas");
+  c.width = c.height = MASK_SIZE;
+  const ctx = c.getContext("2d");
+  if (!ctx) return new Uint8Array(MASK_SIZE * MASK_SIZE);
+  // MARK_VIEWBOX is "256 256 512 512": map that square onto the grid.
+  ctx.scale(MASK_SIZE / 512, MASK_SIZE / 512);
+  ctx.translate(-256, -256);
+  ctx.fill(new Path2D(MARK_SHIELD));
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.lineWidth = 48;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.stroke(new Path2D(MARK_S));
+  const data = ctx.getImageData(0, 0, MASK_SIZE, MASK_SIZE).data;
+  const mask = new Uint8Array(MASK_SIZE * MASK_SIZE);
+  for (let i = 0; i < mask.length; i++) mask[i] = data[i * 4 + 3] > 127 ? 1 : 0;
+  return mask;
+}
 
 function markAlpha(u: number, v: number) {
-  const x = u * 64;
-  const y = v * 64;
-  const d = Math.min(
-    segDist(x, y, 46, 14, 25, 14),
-    x <= 25 ? Math.abs(Math.hypot(x - 25, y - 23) - 9) : Infinity, // left turn, centre (25, 23)
-    segDist(x, y, 25, 32, 39, 32),
-    x >= 39 ? Math.abs(Math.hypot(x - 39, y - 41) - 9) : Infinity, // right turn, centre (39, 41)
-    segDist(x, y, 39, 50, 18, 50),
-  );
-  return d <= 8 ? 1 : 0;
+  markMask ??= buildMarkMask();
+  const x = Math.min(MASK_SIZE - 1, Math.floor(u * MASK_SIZE));
+  const y = Math.min(MASK_SIZE - 1, Math.floor(v * MASK_SIZE));
+  return markMask[y * MASK_SIZE + x];
 }
 
 /**
