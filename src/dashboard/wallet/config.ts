@@ -1,6 +1,6 @@
 import { createAppKit } from "@reown/appkit/react";
-import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
-import { mainnet, robinhood, type AppKitNetwork } from "@reown/appkit/networks";
+import { SolanaAdapter } from "@reown/appkit-adapter-solana/react";
+import { solana, type AppKitNetwork } from "@reown/appkit/networks";
 import { QueryClient } from "@tanstack/react-query";
 import { REOWN_PROJECT_ID } from "../lib/env";
 
@@ -8,10 +8,12 @@ import { REOWN_PROJECT_ID } from "../lib/env";
  * Wallet layer. Created once, at module load, as Reown's docs require:
  * createAppKit must run outside React, before any hook reads it.
  *
- * Robinhood Chain first (it is where Spectral settles), then Ethereum. Email and social login are on because that *is* the product's
- * "ZK Login": a user signs in with Google or email and never sees a seed phrase.
+ * Solana mainnet only. Installed Solana wallets (Phantom, Solflare, Backpack...)
+ * are found through the Wallet Standard; others connect over WalletConnect.
+ * Email and social login are on because that *is* the product's "ZK Login": a
+ * user signs in with Google or email and never sees a seed phrase.
  */
-export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [robinhood, mainnet];
+export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [solana];
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,19 +21,16 @@ export const queryClient = new QueryClient({
   },
 });
 
-// ssr: true makes wagmi reconnect in an effect after mount. Without it, wagmi's
-// <Hydrate> reconnects during render and React warns that the account hooks
-// updated while another component was rendering.
-export const wagmiAdapter = new WagmiAdapter({ networks, projectId: REOWN_PROJECT_ID, ssr: true });
+export const solanaAdapter = new SolanaAdapter();
 
 createAppKit({
-  adapters: [wagmiAdapter],
+  adapters: [solanaAdapter],
   networks,
-  defaultNetwork: robinhood,
+  defaultNetwork: solana,
   projectId: REOWN_PROJECT_ID,
   metadata: {
     name: "Spectral",
-    description: "Privacy-first, authorization-based onchain neobank.",
+    description: "Privacy-first, authorization-based onchain neobank on Solana.",
     url: typeof window !== "undefined" ? window.location.origin : "https://spectral.money",
     icons: [typeof window !== "undefined" ? `${window.location.origin}/brand/logo-500.png` : ""],
   },

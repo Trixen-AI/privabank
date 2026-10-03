@@ -2,19 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <title>Spectral | Privacy-first onchain neobank on Robinhood Chain</title>
-    <meta
-      name="description"
-      content="Spectral is the authorization-based onchain neobank. Prove permission to spend, not ownership of funds: no public balances, no wallet addresses, and compliant settlement in USDC and USDT on Robinhood Chain and Ethereum."
-    />
+    <title>Spectral | Private payments and onchain neobank on Solana</title>
+    <meta name="description" content="Privacy-first onchain neobank on Solana. Prove permission to spend, not ownership: no public balances, no wallet addresses, private USDC and USDT payments." />
     <meta
       name="keywords"
-      content="Spectral, private payments, onchain neobank, zero-knowledge login, shielded pools, Robinhood Chain, Ethereum, USDC, USDT, SPECTRAL"
+      content="Spectral, Solana, private payments, onchain neobank, Solana neobank, privacy payments Solana, zero-knowledge login, shielded pools, USDC on Solana, USDT on Solana, stablecoin payments, SPECTRAL"
     />
+    <meta name="author" content="Spectral Protocol" />
     <link rel="canonical" href="https://spectral.money/" />
-    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="alternate" hreflang="en" href="https://spectral.money/" />
+    <link rel="alternate" hreflang="x-default" href="https://spectral.money/" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="theme-color" content="#050507" />
     <meta name="color-scheme" content="dark" />
     <meta name="application-name" content="Spectral" />
@@ -31,12 +31,11 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Spectral" />
     <meta property="og:url" content="https://spectral.money/" />
-    <meta property="og:title" content="Spectral | Privacy as Infrastructure" />
-    <meta
-      property="og:description"
-      content="The first privacy-first, authorization-based onchain neobank. Users prove permission to spend, not ownership of funds."
-    />
+    <meta property="og:title" content="Spectral | Privacy as Infrastructure on Solana" />
+    <meta property="og:description" content="The privacy-first, authorization-based onchain neobank on Solana. Prove permission to spend, not ownership of funds." />
     <meta property="og:image" content="https://spectral.money/og-image.png" />
+    <meta property="og:image:secure_url" content="https://spectral.money/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Spectral: Privacy as Infrastructure. The authorization-based onchain neobank." />
@@ -46,15 +45,12 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@SpectralPay" />
     <meta name="twitter:creator" content="@SpectralPay" />
-    <meta name="twitter:title" content="Spectral | Privacy as Infrastructure" />
-    <meta
-      name="twitter:description"
-      content="The authorization-based onchain neobank. No public balances, no wallet addresses, compliant private payments."
-    />
+    <meta name="twitter:title" content="Spectral | Privacy as Infrastructure on Solana" />
+    <meta name="twitter:description" content="The authorization-based onchain neobank on Solana. No public balances, no wallet addresses, compliant private payments." />
     <meta name="twitter:image" content="https://spectral.money/og-image.png" />
     <meta name="twitter:image:alt" content="Spectral: Privacy as Infrastructure." />
 
-    <!-- Structured data -->
+    <!-- Structured data (FAQ mirrors the FAQ section in src/data/site.ts) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -71,24 +67,121 @@
               "width": 500,
               "height": 500
             },
-            "sameAs": ["https://x.com/SpectralPay"]
+            "description": "Spectral is a privacy-first, authorization-based onchain neobank on Solana.",
+            "sameAs": [
+              "https://x.com/SpectralPay"
+            ]
           },
           {
             "@type": "WebSite",
             "@id": "https://spectral.money/#website",
             "url": "https://spectral.money/",
             "name": "Spectral",
-            "description": "The authorization-based onchain neobank.",
-            "publisher": { "@id": "https://spectral.money/#organization" },
+            "alternateName": "Spectral Protocol",
+            "description": "The privacy-first, authorization-based onchain neobank on Solana.",
+            "publisher": {
+              "@id": "https://spectral.money/#organization"
+            },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://spectral.money/#webpage",
+            "url": "https://spectral.money/",
+            "name": "Spectral | Private payments and onchain neobank on Solana",
+            "isPartOf": {
+              "@id": "https://spectral.money/#website"
+            },
+            "about": {
+              "@id": "https://spectral.money/#organization"
+            },
+            "primaryImageOfPage": {
+              "@type": "ImageObject",
+              "url": "https://spectral.money/og-image.png",
+              "width": 1200,
+              "height": 630
+            },
             "inLanguage": "en"
           },
           {
             "@type": "WebApplication",
+            "@id": "https://spectral.money/#app",
             "name": "Spectral App",
             "url": "https://spectral.money/app",
             "applicationCategory": "FinanceApplication",
             "operatingSystem": "Web",
-            "publisher": { "@id": "https://spectral.money/#organization" }
+            "browserRequirements": "Requires JavaScript and a Solana wallet",
+            "description": "Issue a spending credential, set daily limits and merchant allowlists, and authorize USDC, USDT and SOL payments on Solana.",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "publisher": {
+              "@id": "https://spectral.money/#organization"
+            }
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://spectral.money/#faq",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What is Spectral?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Spectral is an onchain neobank built on authorization rather than ownership. Instead of a public wallet holding a public balance, you hold a zero-knowledge credential that proves you are allowed to spend. Funds live in a shielded pool, payments are routed by relayers, and merchants are paid in ordinary stablecoins."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "If there is no wallet address, how do I hold money?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Your deposit becomes a note inside a shared shielded pool. The note is a commitment that only a valid proof can consume. Nothing in the pool is addressed to you, which is why an outside observer cannot read your balance, and why there is no address to correlate across payments."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What does authorization-based mean in practice?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "When you pay, you do not present a key that says these funds are mine. You present a proof that says a rule permits this spend: the credential is valid, the note has not been consumed, and the amount sits inside your limit. The protocol verifies the proof and the payment settles."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is this compatible with regulation?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "That is the point of the design. Daily limits, merchant allowlists, and signed audit reports are enforced by the circuits themselves, so a regulator or an auditor can be given a verifiable report without anyone publishing a spending history. Merchants receive clean USDC or USDT with no history attached."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Who pays the network fee?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Relayers do. They accept your proof, cover the network fee, and submit the transaction. That is what keeps your own addresses off the chain entirely, and it is what relayers earn $SPECTRAL for."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What is $SPECTRAL for?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Three things: it pays relayers for verifying proofs, it gives holders the vote over verification keys, spending limits, and compliance policy, and it can be spent on transaction fees at a 25 percent discount so your stablecoin balance stays untouched by fees."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I lose access if I lose my device?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "There is no seed phrase to lose. Credentials are re-issued from the same zero-knowledge login you set up originally, so recovering an account does not require you to have stored a secret and does not reveal your identity to the network."
+                }
+              }
+            ]
           }
         ]
       }
@@ -101,7 +194,12 @@
   <body>
     <div id="root"></div>
     <noscript>
-      Spectral is the privacy-first, authorization-based onchain neobank. Enable JavaScript to use the site and the Spectral app.
+      <h1>Spectral: private payments and the onchain neobank on Solana</h1>
+      <p>
+        Spectral is the privacy-first, authorization-based onchain neobank on Solana. Prove permission to spend, not
+        ownership of funds: no public balances, no wallet addresses, and compliant settlement in USDC and USDT.
+      </p>
+      <p>Enable JavaScript to use the site and the <a href="/app">Spectral app</a>. Follow <a href="https://x.com/SpectralPay">@SpectralPay</a> on X.</p>
     </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>

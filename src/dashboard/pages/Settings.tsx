@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { useAppKit, useAppKitNetwork, useDisconnect } from "@reown/appkit/react";
+import { useAppKit, useDisconnect } from "@reown/appkit/react";
 import { Download, LogOut, Trash2, Upload, Wallet } from "lucide-react";
 import { chainMeta } from "../lib/chains";
 import { download } from "../lib/download";
 import { RELAYER_URL } from "../lib/env";
 import { humanError } from "../lib/errors";
 import { clearWallet, parseBackup, replaceWallet, useWalletData } from "../lib/store";
-import { networks } from "../wallet/config";
 import { useRelayerHealth, useWallet } from "../hooks/data";
 import { AddressChip, Badge, Card, Notice, PageHeader } from "../ui/kit";
 import { useToast } from "../ui/toast-context";
@@ -17,7 +16,6 @@ export default function Settings() {
   const data = useWalletData(w.address);
   const { open } = useAppKit();
   const { disconnect } = useDisconnect();
-  const { switchNetwork } = useAppKitNetwork();
   const relayer = useRelayerHealth();
   const toast = useToast();
   const [confirmClear, setConfirmClear] = useState(false);
@@ -80,28 +78,15 @@ export default function Settings() {
 
         <Card label="Network" title={chainMeta(w.chainId).name}>
           <ul className="net-list">
-            {networks.map((n) => {
-              const id = Number(n.id);
-              const meta = chainMeta(id);
-              const active = !w.unsupported && w.walletChain === id;
-              return (
-                <li key={id}>
-                  <span>
-                    <strong>{meta.name}</strong>
-                    <span className="muted small"> · chain {id}</span>
-                  </span>
-                  {meta.testnet ? <Badge tone="muted">Testnet</Badge> : null}
-                  {active ? (
-                    <Badge tone="ok">Connected</Badge>
-                  ) : (
-                    <button type="button" className="btn btn-sec btn-sm" onClick={() => switchNetwork(n)}>
-                      Switch
-                    </button>
-                  )}
-                </li>
-              );
-            })}
+            <li>
+              <span>
+                <strong>Solana</strong>
+                <span className="muted small"> · mainnet</span>
+              </span>
+              <Badge tone="ok">Connected</Badge>
+            </li>
           </ul>
+          <p className="muted small">Spectral runs on Solana mainnet. Balances, history and payments all read from and settle on Solana.</p>
         </Card>
       </div>
 
@@ -119,7 +104,7 @@ export default function Settings() {
           </dl>
         ) : (
           <p className="muted">
-            No relayer is connected, so payments settle from your own wallet: you pay gas and the transfer is public. Gasless relayed
+            No relayer is connected, so payments settle from your own wallet: you pay the network fee and the transfer is public. Gasless relayed
             settlement switches on here as soon as a relayer is online.
           </p>
         )}
@@ -192,7 +177,7 @@ export default function Settings() {
       </Card>
 
       <p className="muted small settings-foot">
-        Spectral app · <Link to="/">Website</Link> · Networks: Robinhood Chain and Ethereum.
+        Spectral app · <Link to="/">Website</Link> · Network: Solana.
       </p>
     </>
   );

@@ -7,7 +7,7 @@ import { fmtAmount, fmtDate, shortAddr } from "../lib/format";
 import { useWalletData, type Authorization } from "../lib/store";
 import type { ActivityItem } from "../lib/data";
 import { flattenActivity, useActivity, useWallet } from "../hooks/data";
-import { Badge, Card, CopyButton, Empty, ErrorNote, Notice, PageHeader, Skeleton, TxLink, type Tone } from "../ui/kit";
+import { Badge, Card, CopyButton, Empty, ErrorNote, PageHeader, Skeleton, TxLink, type Tone } from "../ui/kit";
 import { ActivityRow } from "../ui/ActivityRow";
 
 type Tab = "chain" | "auth";
@@ -31,7 +31,6 @@ export default function Activity() {
   const [token, setToken] = useState("all");
 
   const items = useMemo(() => flattenActivity(activity.data?.pages), [activity.data]);
-  const firstPage = activity.data?.pages[0];
   const auths = data.authorizations.filter((a) => a.chainId === w.chainId);
 
   const tokens = useMemo(() => {
@@ -129,16 +128,6 @@ export default function Activity() {
             </select>
           </div>
 
-          {firstPage?.source === "rpc" ? (
-            <Notice tone="info">
-              {chain.short}'s explorer isn't reachable from the browser, so this list is read straight from chain logs. It shows token
-              transfers; plain ETH transfers appear on the{" "}
-              <a href={`${chain.explorer}/address/${w.address}`} target="_blank" rel="noopener noreferrer">
-                explorer
-              </a>
-              .
-            </Notice>
-          ) : null}
 
           {activity.isLoading ? (
             <div className="stack-8">

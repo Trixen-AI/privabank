@@ -565,11 +565,16 @@
   opacity: 1;
 }
 /* On the dark canvas each mark shows as its brand's reversed (white, one-colour)
-   variant, which the Robinhood, Circle and Tether kits all provide for dark
-   backgrounds. Shapes and proportions are untouched. */
+   variant, which the Circle and Tether kits provide for dark backgrounds.
+   Solana's file is already its dark-background version, so it keeps its own
+   colours. Shapes and proportions are untouched. */
 .logo-cell img {
   filter: brightness(0) invert(1);
   opacity: 0.72;
+}
+.logo-cell img.is-original {
+  filter: none;
+  opacity: 0.9;
 }
 
 /* ============================ PARADIGM (intro) ============================ */
@@ -2084,6 +2089,13 @@
   flex-wrap: wrap;
   font-size: 13px;
   color: var(--invert-fg3);
+}
+.footer-disclaimer {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0.8;
 }
 .footer-legal {
   display: flex;

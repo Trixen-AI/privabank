@@ -39,7 +39,7 @@ export function ConnectGate({ onConnect, connecting }: { onConnect: () => void; 
             Open your <span className="hl">private account.</span>
           </h1>
           <p className="gate-sub">
-            Connect to issue your credential, set spending rules, and authorize payments on Robinhood Chain and Ethereum.
+            Connect to issue your credential, set spending rules, and authorize payments on Solana.
           </p>
           <div className="gate-cta">
             <button type="button" className="btn btn-pri" onClick={onConnect} disabled={connecting}>

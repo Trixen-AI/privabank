@@ -1,9 +1,8 @@
 import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router";
-import { WagmiProvider } from "wagmi";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useAppKit } from "@reown/appkit/react";
-import { queryClient, wagmiAdapter } from "./wallet/config";
+import { queryClient } from "./wallet/config";
 import { useWallet } from "./hooks/data";
 import { Shell } from "./layout/Shell";
 import { ConnectGate } from "./layout/Gates";
@@ -36,8 +35,8 @@ function Routed() {
 
   return (
     <Shell>
-      {/* key: switching wallet or network remounts pages so no state leaks between accounts */}
-      <Suspense fallback={pageFallback} key={`${w.address}-${w.chainId}`}>
+      {/* key: switching wallet remounts pages so no state leaks between accounts */}
+      <Suspense fallback={pageFallback} key={w.address}>
         <Routes>
           <Route index element={<Overview />} />
           <Route path="pay" element={<Pay />} />
@@ -55,12 +54,10 @@ function Routed() {
 
 export default function WalletRoot() {
   return (
-    <WagmiProvider config={wagmiAdapter.wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <ToastProvider>
-          <Routed />
-        </ToastProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>
+        <Routed />
+      </ToastProvider>
+    </QueryClientProvider>
   );
 }

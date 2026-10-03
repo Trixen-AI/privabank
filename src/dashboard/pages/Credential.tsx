@@ -1,18 +1,10 @@
 import { useState } from "react";
-import { useSignTypedData, useSwitchChain } from "wagmi";
 import { BadgeCheck, RotateCcw, ShieldCheck, Trash2 } from "lucide-react";
 import { chainMeta } from "../lib/chains";
 import { deriveCard, normalizeHolder } from "../lib/card";
 import { humanError } from "../lib/errors";
 import { fmtDate, shortAddr } from "../lib/format";
-import {
-  CREDENTIAL_STATEMENT,
-  CREDENTIAL_TYPES,
-  credentialMessage,
-  deriveCredential,
-  domain,
-  verifyCredentialSignature,
-} from "../lib/protocol";
+import { credentialMessage, deriveCredential, verifyCredentialSignature } from "../lib/protocol";
 import { setCredential, useWalletData } from "../lib/store";
 import { useWallet } from "../hooks/data";
 import { Badge, Card, CopyButton, Notice, PageHeader } from "../ui/kit";
@@ -34,8 +26,6 @@ export default function Credential() {
   const w = useWallet();
   const data = useWalletData(w.address);
   const toast = useToast();
-  const { signTypedDataAsync } = useSignTypedData();
-  const { switchChainAsync } = useSwitchChain();
   const [busy, setBusy] = useState<"issue" | "verify" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [check, setCheck] = useState<Check>(null);
@@ -46,15 +36,8 @@ export default function Credential() {
   const c = data.credential;
   const method = w.loginMethod ? (METHOD_LABEL[w.loginMethod] ?? w.loginMethod) : w.connectorName ?? "Wallet";
 
-  async function sign(chainId: number) {
-    if (w.walletChain !== chainId) await switchChainAsync({ chainId });
-    return signTypedDataAsync({
-      domain: domain(chainId),
-      types: CREDENTIAL_TYPES,
-      primaryType: "Credential",
-      message: credentialMessage(w.address!, chainId),
-    });
-  }
+  /** Signs the credential statement (Solana signMessage). */
+  const sign = () => w.signMessage(credentialMessage(w.address!));
 
   async function issue() {
     if (!w.address) return;
@@ -69,10 +52,9 @@ export default function Credential() {
     setError(null);
     try {
       const chainId = w.chainId;
-      const sig = await sign(chainId);
-      const valid = await verifyCredentialSignature(w.address, chainId, sig);
-      if (!valid) throw new Error("The signature didn't verify against this address.");
-      const { id, commitment } = deriveCredential(sig, w.address, chainId);
+      const sig = await sign();
+      if (!verifyCredentialSignature(w.address, sig)) throw new Error("The signature didn't verify against this address.");
+      const { id, commitment } = deriveCredential(sig, w.address);
       setCredential(w.address, {
         id,
         commitment,
@@ -96,20 +78,19 @@ export default function Credential() {
     setBusy("verify");
     setCheck(null);
     try {
-      const sig = await sign(c.chainId);
-      const valid = await verifyCredentialSignature(w.address, c.chainId, sig);
-      if (!valid) {
+      const sig = await sign();
+      if (!verifyCredentialSignature(w.address, sig)) {
         setCheck({ tone: "bad", text: "The signature didn't verify for this address." });
         return;
       }
-      const same = deriveCredential(sig, w.address, c.chainId).id === c.id;
+      const same = deriveCredential(sig, w.address).id === c.id;
       setCredential(w.address, { ...c, deterministic: same });
       setCheck(
         same
           ? { tone: "ok", text: "Verified. Your wallet re-derived the same credential ID." }
           : {
               tone: "warn",
-              text: "Signature valid, but your wallet signs differently each time (common for smart and embedded wallets), so the ID stays tied to the original signature.",
+              text: "Signature valid, but your wallet signs differently each time (some embedded and MPC wallets do), so the ID stays tied to the original signature.",
             },
       );
     } catch (e) {
@@ -260,7 +241,9 @@ export default function Credential() {
               </li>
               <li>
                 <strong>You sign one statement.</strong> Your wallet shows exactly this text:
-                <blockquote className="statement">{CREDENTIAL_STATEMENT}</blockquote>
+                <blockquote className="statement" style={{ whiteSpace: "pre-line" }}>
+                  {credentialMessage(w.address ?? "")}
+                </blockquote>
               </li>
               <li>
                 <strong>The credential is derived from that signature.</strong> The signature is hashed immediately and never stored.

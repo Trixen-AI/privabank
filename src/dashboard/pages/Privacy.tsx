@@ -5,19 +5,19 @@ import { addressUrl, chainMeta } from "../lib/chains";
 import { fmtAgo, fmtDay, shortAddr } from "../lib/format";
 import { setPolicy, useWalletData } from "../lib/store";
 import { useExposure, useWallet } from "../hooks/data";
-import { Card, Empty, ErrorNote, Notice, PageHeader, Skeleton } from "../ui/kit";
+import { Card, Empty, ErrorNote, PageHeader, Skeleton } from "../ui/kit";
 import { ExposureGauge } from "../ui/ExposureGauge";
 
 /**
  * The glass-house view: everything a stranger learns about this address from
- * the public ledger. Built from live balances, the account nonce, ENS and the
- * loaded transfer history, so it changes as the account does.
+ * the public ledger. Built from live balances, the transaction count, the .sol
+ * name and the loaded history, so it changes as the account does.
  */
 export default function Privacy() {
   const w = useWallet();
   const data = useWalletData(w.address);
   const qc = useQueryClient();
-  const { exposure, footprint, loading, error, activitySource } = useExposure(w.chainId, w.address);
+  const { exposure, footprint, loading, error } = useExposure(w.chainId, w.address);
   const chain = chainMeta(w.chainId);
 
   const refresh = () => {
@@ -61,8 +61,8 @@ export default function Privacy() {
                   : `A stranger can build a ${exposure.level.toLowerCase()}-detail picture of this account from public data alone.`}
               </p>
               <p className="muted small">
-                Based on {exposure.sample} loaded transfer{exposure.sample === 1 ? "" : "s"}
-                {footprint?.explorerTxCount != null ? ` of ${footprint.explorerTxCount.toLocaleString("en-US")} indexed` : ""}
+                Based on {exposure.sample} loaded transaction{exposure.sample === 1 ? "" : "s"}
+                {footprint ? ` of ${footprint.txCountCapped ? "1,000+" : footprint.txCount.toLocaleString("en-US")} on record` : ""}
                 {exposure.firstSeen ? `, going back to ${fmtDay(exposure.firstSeen)}` : ""}.
               </p>
             </Card>
@@ -87,12 +87,6 @@ export default function Privacy() {
             </Card>
           </div>
 
-          {activitySource === "rpc" ? (
-            <Notice tone="info">
-              History on {chain.short} is read from chain logs because its explorer blocks browser requests. Token transfers are
-              included; plain ETH transfers are not, so the real exposure may be higher.
-            </Notice>
-          ) : null}
 
           <Card label="Your graph" title="Counterparties anyone can link to you">
             {exposure.counterparties.length ? (

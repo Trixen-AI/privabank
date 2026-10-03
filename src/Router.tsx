@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import App from "./App";
 
-// The dashboard (wallet stack, viem, AppKit) loads only when someone opens /app.
+// The dashboard (wallet stack, Solana web3, AppKit) loads only when someone opens /app.
 const DashboardApp = lazy(() => import("./dashboard/DashboardApp"));
 
 export function Router() {

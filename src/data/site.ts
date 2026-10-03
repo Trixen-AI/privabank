@@ -54,7 +54,7 @@ export const NAV = {
         links: [
           {
             title: "Relayer Network",
-            desc: "Relayers pay gas and route transactions, so no address of yours ever touches the chain.",
+            desc: "Relayers pay the Solana fee and route transactions, so no address of yours ever touches the chain.",
             href: "#layers",
             icon: "radio-tower",
           },
@@ -113,7 +113,7 @@ export const NAV = {
       },
       {
         title: "GitHub",
-        desc: "Circuits, contracts, and the relayer client, all open for review.",
+        desc: "Circuits, Solana programs, and the relayer client, all open for review.",
         href: "#build",
         icon: "github",
       },
@@ -145,7 +145,7 @@ export const HERO = {
   noteLink: { label: "Read the whitepaper", href: "#papers" },
   spec: [
     { k: "Current version", v: "v0.1.0" },
-    { k: "Network", v: "Ethereum / Robinhood Chain" },
+    { k: "Network", v: "Solana" },
     { k: "Status", v: "Live" },
     { k: "Powered by", v: "Spectral Protocol" },
   ],
@@ -170,7 +170,7 @@ export const PARADIGM = {
       chips: [
         "payroll · 2,480 USDC",
         "rent · 1,900 USDC",
-        "transfer · 0.42 ETH",
+        "transfer · 3.5 SOL",
         "refund · 82.40 USDT",
         "invoice #4471",
         "settlement · 640 USDC",
@@ -195,7 +195,7 @@ export const PARADIGM = {
 /* ---------------------------------------------------------------- NETWORK */
 
 export const NETWORK = {
-  liveLabel: "Live on mainnet",
+  liveLabel: "Live on Solana mainnet",
   h2a: "The infrastructure of ",
   h2b: "privacy.",
   desc: "A relayer network that verifies authorization proofs and settles stablecoins, running continuously across independent operators.",
@@ -233,7 +233,7 @@ export const PILLARS = {
     {
       icon: "wand-sparkles",
       title: "Invisible Execution",
-      body: "Relayers cover gas and route every transaction. You authorize the payment and nothing else, so no address of yours is ever written down.",
+      body: "Relayers cover the network fee and route every transaction. You authorize the payment and nothing else, so no address of yours is ever written down.",
     },
   ],
 };
@@ -259,7 +259,7 @@ export const COMPLIANCE = {
     {
       value: "< 2s",
       key: "Settlement time",
-      desc: "Proof verification and stablecoin payout complete in under two seconds on Robinhood Chain.",
+      desc: "Proof verification and stablecoin payout complete in under two seconds on Solana.",
     },
   ],
   cta: { label: "Set your spending controls", href: "/app/controls" },
@@ -296,16 +296,16 @@ export const LAYERS = {
       tab: "Execution Layer",
       icon: "radio-tower",
       quote:
-        "Relayers accept a signed proof, pay the gas, and submit the transaction on your behalf. Gas abstraction removes the last link between a payment and an address you control.",
+        "Relayers accept a signed proof, pay the network fee, and submit the transaction on your behalf. Fee abstraction removes the last link between a payment and an address you control.",
       cite: "Execution Layer",
-      tags: ["Relayers", "Gas abstraction"],
+      tags: ["Relayers", "Fee abstraction"],
     },
     {
       id: "settlement",
       tab: "Settlement Layer",
       icon: "banknote",
       quote:
-        "Payouts leave the pool as fully backed stablecoins and settle with onchain finality. What the merchant banks is a one to one claim, indistinguishable from any other transfer.",
+        "Payouts leave the pool as fully backed stablecoins and settle with Solana finality. What the merchant banks is a one to one claim, indistinguishable from any other transfer.",
       cite: "Settlement Layer",
       tags: ["Stablecoins", "Onchain finality"],
     },
@@ -373,10 +373,10 @@ export const TOKEN = {
       idx: "03",
       tab: "Fee Shielding",
       title: "Pay fees in $SPECTRAL at a discount",
-      body: "Settling transaction fees in $SPECTRAL takes 25 percent off and decouples your stablecoin balance from gas entirely. Your spending balance stays a spending balance.",
+      body: "Settling transaction fees in $SPECTRAL takes 25 percent off and decouples your stablecoin balance from network fees entirely. Your spending balance stays a spending balance.",
       figs: [
         { v: "-25%", k: "Fee discount" },
-        { v: "0", k: "Stablecoin gas spent" },
+        { v: "0", k: "Stablecoin spent on fees" },
       ],
     },
     {
@@ -475,7 +475,7 @@ export const CTA: {
     {
       label: "Network",
       title: "Run a relayer",
-      body: "Verify proofs, pay gas on behalf of users, and earn $SPECTRAL for widening the anonymity set.",
+      body: "Verify proofs, pay Solana fees on behalf of users, and earn $SPECTRAL for widening the anonymity set.",
       visual: "relayer",
       buttons: [
         { label: "Run a relayer", href: "#build", primary: false, soon: true },
@@ -493,7 +493,7 @@ export const CTA: {
   ],
   phone: { label: "Shielded balance", amount: "$24,592.00" },
   code: [
-    "const cred = await priva.login({ provider: \"google\" });",
+    "const cred = await spectral.login({ provider: \"google\" });",
     "const proof = await cred.authorize({",
     "  amount: 42_00, asset: \"USDC\",",
     "  merchant: \"m_7f3a\",",
@@ -532,12 +532,12 @@ export const FAQ = {
       a: "That is the point of the design. Daily limits, merchant allowlists, and signed audit reports are enforced by the circuits themselves, so a regulator or an auditor can be given a verifiable report without anyone publishing a spending history. Merchants receive clean USDC or USDT with no history attached.",
     },
     {
-      q: "Who pays the gas?",
+      q: "Who pays the network fee?",
       a: "Relayers do. They accept your proof, cover the network fee, and submit the transaction. That is what keeps your own addresses off the chain entirely, and it is what relayers earn $SPECTRAL for.",
     },
     {
       q: "What is $SPECTRAL for?",
-      a: "Three things: it pays relayers for verifying proofs, it gives holders the vote over verification keys, spending limits, and compliance policy, and it can be spent on transaction fees at a 25 percent discount so your stablecoin balance stays untouched by gas.",
+      a: "Three things: it pays relayers for verifying proofs, it gives holders the vote over verification keys, spending limits, and compliance policy, and it can be spent on transaction fees at a 25 percent discount so your stablecoin balance stays untouched by fees.",
     },
     {
       q: "Can I lose access if I lose my device?",
@@ -601,6 +601,8 @@ export const FOOTER = {
       ],
     },
   ],
+  disclaimer:
+    "Solana, USDC and Tether are trademarks of their owners and are named only to identify the network and assets Spectral settles on. Spectral is not affiliated with the Solana Foundation, Circle or Tether.",
   legal: [
     { label: "Terms of Service", href: "#footer" },
     { label: "Privacy Policy", href: "#footer" },

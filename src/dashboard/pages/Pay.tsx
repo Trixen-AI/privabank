@@ -1,23 +1,18 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useSendTransaction, useSignTypedData, useSwitchChain, useWriteContract } from "wagmi";
-import { erc20Abi, formatEther, getAddress, isAddress, type Hex } from "viem";
-import { normalize } from "viem/ens";
 import { AlertTriangle, BadgeCheck, Check, CircleSlash, Loader2, Radio, Send, Wallet } from "lucide-react";
-import { chainMeta, txUrl } from "../lib/chains";
-import { publicClient } from "../lib/clients";
+import { chainMeta, isSolanaAddress, SOL_DECIMALS, txUrl } from "../lib/chains";
+import { resolveSolName } from "../lib/data";
+import { buildTransfer, estimateFee, waitForSignature } from "../lib/transfer";
 import { RELAYER_URL } from "../lib/env";
 import { humanError, isUserRejection } from "../lib/errors";
-import { fmtAmount, shortAddr } from "../lib/format";
+import { fmtAmount, formatUnits, shortAddr } from "../lib/format";
 import {
   AUTH_TTL_MS,
   checkPolicy,
-  domain,
-  isNative,
   newDraft,
   parseAmount,
-  PAYMENT_TYPES,
   paymentMessage,
   spentToday,
   submitToRelayer,
@@ -48,20 +43,15 @@ export default function Pay() {
   const [current, setCurrent] = useState<Authorization | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const { signTypedDataAsync } = useSignTypedData();
-  const { sendTransactionAsync } = useSendTransaction();
-  const { writeContractAsync } = useWriteContract();
-  const { switchChainAsync } = useSwitchChain();
-
   const holdings = useMemo(() => (portfolio.data?.holdings ?? []).filter((h) => h.raw > 0n), [portfolio.data]);
   const token: Holding | null =
-    holdings.find((h) => tokenAddr && h.token.toLowerCase() === tokenAddr.toLowerCase()) ?? holdings[0] ?? null;
+    holdings.find((h) => tokenAddr && h.token === tokenAddr) ?? holdings[0] ?? null;
 
-  // ENS names resolve on Ethereum regardless of the payment network.
-  const ensName = recipientInput.trim().toLowerCase().endsWith(".eth") ? recipientInput.trim().toLowerCase() : null;
+  // .sol names resolve through the Solana Name Service.
+  const ensName = recipientInput.trim().toLowerCase().endsWith(".sol") ? recipientInput.trim().toLowerCase() : null;
   const ens = useQuery({
-    queryKey: ["ens", ensName],
-    queryFn: () => publicClient(1).getEnsAddress({ name: normalize(ensName!) }),
+    queryKey: ["sol-name", ensName],
+    queryFn: () => resolveSolName(ensName!),
     enabled: !!ensName,
     staleTime: 5 * 60_000,
   });
@@ -81,26 +71,14 @@ export default function Pay() {
   if (ensName && !ens.isLoading && !ens.data) issues.unshift({ level: "block", text: `${ensName} doesn't resolve to an address.` });
   const blocked = issues.some((i) => i.level === "block") || w.unsupported;
 
-  // Network fee for wallet settlement, estimated against the live chain.
-  const canEstimate = !!(w.address && token && amount && isAddress(recipient) && method === "wallet" && !blocked);
+  // Network fee for wallet settlement, priced by the live cluster for this exact transfer.
+  const canEstimate = !!(w.address && token && amount && isSolanaAddress(recipient) && method === "wallet" && !blocked);
   const fee = useQuery({
-    queryKey: ["fee", w.chainId, token?.token, recipient, amount?.toString()],
+    queryKey: ["fee", token?.token, recipient, amount?.toString()],
     enabled: canEstimate,
     queryFn: async () => {
-      const c = publicClient(w.chainId);
-      const [gas, price] = await Promise.all([
-        isNative(token!.token)
-          ? c.estimateGas({ account: w.address!, to: getAddress(recipient), value: amount! })
-          : c.estimateContractGas({
-              account: w.address!,
-              address: token!.token,
-              abi: erc20Abi,
-              functionName: "transfer",
-              args: [getAddress(recipient), amount!],
-            }),
-        c.getGasPrice(),
-      ]);
-      return gas * price;
+      const { tx } = await buildTransfer({ from: w.address!, to: recipient, mint: token!.token, amount: amount!, decimals: token!.decimals });
+      return estimateFee(tx);
     },
     retry: false,
   });
@@ -112,22 +90,20 @@ export default function Pay() {
     const addr = w.address!;
     setPhase("settling");
     try {
-      let hash: Hex | undefined;
+      let hash: string | undefined;
       if (how === "relayer") {
         const res = await submitToRelayer(auth);
         patchAuthorization(addr, auth.id, { status: res.txHash ? "submitted" : "relayed", relayerRef: res.id, txHash: res.txHash, settlement: "relayer" });
         hash = res.txHash;
       } else {
-        if (w.walletChain !== auth.chainId) await switchChainAsync({ chainId: auth.chainId });
-        hash = isNative(auth.token.address)
-          ? await sendTransactionAsync({ chainId: auth.chainId, to: auth.recipient, value: BigInt(auth.amount) })
-          : await writeContractAsync({
-              chainId: auth.chainId,
-              address: auth.token.address,
-              abi: erc20Abi,
-              functionName: "transfer",
-              args: [auth.recipient, BigInt(auth.amount)],
-            });
+        const { tx } = await buildTransfer({
+          from: addr,
+          to: auth.recipient,
+          mint: auth.token.address,
+          amount: BigInt(auth.amount),
+          decimals: auth.token.decimals,
+        });
+        hash = await w.sendTransaction(tx);
         patchAuthorization(addr, auth.id, { status: "submitted", txHash: hash, settlement: "wallet" });
       }
 
@@ -140,12 +116,11 @@ export default function Pay() {
 
       setCurrent({ ...auth, txHash: hash, status: "submitted" });
       setPhase("confirming");
-      const receipt = await publicClient(auth.chainId).waitForTransactionReceipt({ hash, timeout: 180_000 });
-      const ok = receipt.status === "success";
-      patchAuthorization(addr, auth.id, { status: ok ? "settled" : "failed", error: ok ? undefined : "Reverted on-chain" });
+      const ok = await waitForSignature(hash);
+      patchAuthorization(addr, auth.id, { status: ok ? "settled" : "failed", error: ok ? undefined : "Failed on-chain" });
       setCurrent({ ...auth, txHash: hash, status: ok ? "settled" : "failed" });
       setPhase(ok ? "done" : "error");
-      if (!ok) setError("The transaction reverted on-chain.");
+      if (!ok) setError("The transaction failed on-chain.");
       qc.invalidateQueries({ queryKey: ["portfolio", auth.chainId] });
       qc.invalidateQueries({ queryKey: ["activity", auth.chainId] });
       toast({
@@ -171,19 +146,14 @@ export default function Pay() {
     const draft = newDraft({
       chainId: w.chainId,
       credential: data.credential.id,
-      recipient: getAddress(recipient),
+      recipient,
       token: { address: token.token, symbol: token.symbol, decimals: token.decimals },
       amount,
     });
-    let signature: Hex;
+    const message = paymentMessage(draft);
+    let signature: string;
     try {
-      if (w.walletChain !== draft.chainId) await switchChainAsync({ chainId: draft.chainId });
-      signature = await signTypedDataAsync({
-        domain: domain(draft.chainId),
-        types: PAYMENT_TYPES,
-        primaryType: "PaymentAuthorization",
-        message: paymentMessage(draft),
-      });
+      signature = await w.signMessage(message);
     } catch (e) {
       setPhase(isUserRejection(e) ? "form" : "error");
       setError(humanError(e));
@@ -199,6 +169,7 @@ export default function Pay() {
       deadline: draft.deadline,
       createdAt: draft.deadline - AUTH_TTL_MS,
       memo: memo.trim() || undefined,
+      message,
       signature,
       status: "signed",
     };
@@ -271,7 +242,7 @@ export default function Pay() {
               <span className="field-label">Recipient</span>
               <input
                 className="input mono"
-                placeholder="0x… or name.eth"
+                placeholder="Solana address or name.sol"
                 value={recipientInput}
                 onChange={(e) => setRecipientInput(e.target.value)}
                 list="merchant-list"
@@ -373,7 +344,7 @@ export default function Pay() {
                   <span>
                     <strong>Relayer</strong>
                     <span className="muted small">
-                      {RELAYER_URL ? "Gasless. The relayer pays gas and submits for you." : "No relayer is online for this app yet."}
+                      {RELAYER_URL ? "Gasless. The relayer pays the fee and submits for you." : "No relayer is online for this app yet."}
                     </span>
                   </span>
                 </label>
@@ -382,7 +353,7 @@ export default function Pay() {
                   <Wallet size={18} />
                   <span>
                     <strong>From your wallet</strong>
-                    <span className="muted small">You pay gas. The transfer is visible on the explorer like any wallet payment.</span>
+                    <span className="muted small">You pay the network fee. The transfer is visible on Solscan like any wallet payment.</span>
                   </span>
                 </label>
               </div>
@@ -403,7 +374,7 @@ export default function Pay() {
               </div>
               <div>
                 <dt>To</dt>
-                <dd className="mono">{isAddress(recipient) ? shortAddr(recipient) : "–"}</dd>
+                <dd className="mono">{isSolanaAddress(recipient) ? shortAddr(recipient) : "–"}</dd>
               </div>
               <div>
                 <dt>Network</dt>
@@ -415,7 +386,7 @@ export default function Pay() {
                   {method === "relayer"
                     ? "Paid by relayer"
                     : fee.data != null
-                      ? `≈ ${Number(formatEther(fee.data)).toPrecision(3)} ETH`
+                      ? `≈ ${formatUnits(fee.data, SOL_DECIMALS)} SOL`
                       : fee.isFetching
                         ? "Estimating…"
                         : fee.error
@@ -495,7 +466,7 @@ function PayProgress({
         })}
       </ol>
 
-      {phase === "signing" ? <p className="muted">Check your wallet: it's asking you to sign the payment authorization.</p> : null}
+      {phase === "signing" ? <p className="muted">Check your wallet: it's asking you to sign the payment authorization message.</p> : null}
       {phase === "settling" ? <p className="muted">Submitting the payment. Your wallet may ask you to confirm the transfer.</p> : null}
       {phase === "confirming" ? <p className="muted">Waiting for the network to include the transaction.</p> : null}
       {error ? <Notice tone="bad">{error}</Notice> : null}
@@ -503,7 +474,7 @@ function PayProgress({
       {auth.txHash ? (
         <p>
           <a href={txUrl(auth.chainId, auth.txHash)} target="_blank" rel="noopener noreferrer">
-            View transaction on the explorer
+            View transaction on Solscan
           </a>
         </p>
       ) : null}

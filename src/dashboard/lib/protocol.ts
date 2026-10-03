@@ -1,98 +1,79 @@
-import {
-  encodeAbiParameters,
-  getAddress,
-  isAddress,
-  keccak256,
-  parseUnits,
-  toBytes,
-  toHex,
-  type Address,
-  type Hex,
-} from "viem";
-import { NATIVE } from "./chains";
-import { publicClient } from "./clients";
+import bs58 from "bs58";
+import { ed25519 } from "@noble/curves/ed25519.js";
+import { sha256 } from "@noble/hashes/sha2.js";
+import { bytesToHex, utf8ToBytes } from "@noble/hashes/utils.js";
+import { chainMeta, isSolanaAddress, NATIVE } from "./chains";
 import { RELAYER_URL } from "./env";
+import { formatUnits, parseUnits } from "./format";
 import type { ActivityItem } from "./data";
 import { limitKey, type Authorization, type WalletData } from "./store";
 
-/* ================================================================ domain */
-
-/**
- * EIP-712 domain for every Spectral signature. No verifyingContract yet: the
- * on-chain verifier is not deployed, so signatures are scoped by name, version
- * and chain. Adding the contract later is a version bump.
+/*
+ * Spectral signs plain-text messages (Solana's signMessage, ed25519). Every
+ * message names the app, the action and the network, so a signature for one
+ * purpose can never be replayed as another. Signatures are verified here in
+ * the browser against the holder's public key.
  */
-export const domain = (chainId: number) => ({ name: "Spectral", version: "1", chainId }) as const;
+
+const NETWORK_LABEL = "solana:mainnet";
+
+const hex = (b: Uint8Array) => `0x${bytesToHex(b)}`;
+const concat = (...parts: (Uint8Array | string)[]) => {
+  const bytes = parts.map((p) => (typeof p === "string" ? utf8ToBytes(p) : p));
+  const out = new Uint8Array(bytes.reduce((n, b) => n + b.length, 0));
+  let o = 0;
+  for (const b of bytes) {
+    out.set(b, o);
+    o += b.length;
+  }
+  return out;
+};
+
+/** Checks an ed25519 signature (base58) over a UTF-8 message against a Solana address. */
+export function verifySolanaSignature(holder: string, message: string, signatureB58: string) {
+  try {
+    return ed25519.verify(bs58.decode(signatureB58), utf8ToBytes(message), bs58.decode(holder));
+  } catch {
+    return false;
+  }
+}
 
 /* ============================================================ credential */
-
-export const CREDENTIAL_TYPES = {
-  Credential: [
-    { name: "holder", type: "address" },
-    { name: "statement", type: "string" },
-    { name: "scope", type: "uint256" },
-  ],
-} as const;
 
 export const CREDENTIAL_STATEMENT =
   "Issue my Spectral spending credential for this address. This signature does not move funds and does not approve any spending.";
 
-export const credentialMessage = (holder: Address, chainId: number) => ({
-  holder,
-  statement: CREDENTIAL_STATEMENT,
-  scope: BigInt(chainId),
-});
+export const credentialMessage = (holder: string) =>
+  ["Spectral credential", "", CREDENTIAL_STATEMENT, "", `Holder: ${holder}`, `Network: ${NETWORK_LABEL}`].join("\n");
 
 /**
  * Derives the public credential from the holder's signature. The signature is
- * the secret: it is hashed immediately and never stored. Deterministic signers
- * (plain EOAs) re-derive the same ID from the same wallet every time.
+ * the secret: it is hashed immediately and never stored. ed25519 signatures are
+ * deterministic, so the same wallet re-derives the same ID every time.
  */
-export function deriveCredential(signature: Hex, holder: Address, chainId: number) {
-  const secret = keccak256(signature);
-  const id = keccak256(encodeAbiParameters([{ type: "bytes32" }, { type: "string" }], [secret, "spectral.credential.id"]));
-  const commitment = keccak256(
-    encodeAbiParameters([{ type: "bytes32" }, { type: "address" }, { type: "uint256" }], [id, holder, BigInt(chainId)]),
-  );
-  return { id, commitment };
+export function deriveCredential(signatureB58: string, holder: string) {
+  const secret = sha256(bs58.decode(signatureB58));
+  const idBytes = sha256(concat(secret, "spectral.credential.id"));
+  const commitment = sha256(concat(idBytes, holder, NETWORK_LABEL));
+  return { id: hex(idBytes), commitment: hex(commitment) };
 }
 
-/** Checks a fresh credential signature against the chain (EOA or ERC-1271 smart account). */
-export async function verifyCredentialSignature(holder: Address, chainId: number, signature: Hex) {
-  return publicClient(chainId).verifyTypedData({
-    address: holder,
-    domain: domain(chainId),
-    types: CREDENTIAL_TYPES,
-    primaryType: "Credential",
-    message: credentialMessage(holder, chainId),
-    signature,
-  });
-}
+export const verifyCredentialSignature = (holder: string, signatureB58: string) =>
+  verifySolanaSignature(holder, credentialMessage(holder), signatureB58);
 
 /* ========================================================= authorization */
 
-export const PAYMENT_TYPES = {
-  PaymentAuthorization: [
-    { name: "credential", type: "bytes32" },
-    { name: "recipient", type: "address" },
-    { name: "token", type: "address" },
-    { name: "amount", type: "uint256" },
-    { name: "nonce", type: "bytes32" },
-    { name: "deadline", type: "uint256" },
-  ],
-} as const;
-
 export const AUTH_TTL_MS = 15 * 60_000;
 
-export const newNonce = (): Hex => toHex(crypto.getRandomValues(new Uint8Array(32)));
+export const newNonce = () => hex(crypto.getRandomValues(new Uint8Array(32)));
 
 export type PaymentDraft = {
   chainId: number;
-  credential: Hex;
-  recipient: Address;
-  token: { address: Address; symbol: string; decimals: number };
+  credential: string;
+  recipient: string;
+  token: { address: string; symbol: string; decimals: number };
   amount: bigint;
-  nonce: Hex;
+  nonce: string;
   deadline: number;
 };
 
@@ -101,21 +82,24 @@ export function newDraft(input: Omit<PaymentDraft, "nonce" | "deadline">): Payme
   return { ...input, nonce: newNonce(), deadline: Date.now() + AUTH_TTL_MS };
 }
 
-export const paymentMessage = (d: PaymentDraft) => ({
-  credential: d.credential,
-  recipient: d.recipient,
-  token: d.token.address,
-  amount: d.amount,
-  nonce: d.nonce,
-  deadline: BigInt(Math.floor(d.deadline / 1000)),
-});
+/** The exact text the wallet shows and signs for a payment authorization. */
+export const paymentMessage = (d: PaymentDraft) =>
+  [
+    "Spectral payment authorization",
+    "",
+    `Pay: ${formatUnits(d.amount, d.token.decimals)} ${d.token.symbol}`,
+    `Asset: ${d.token.address === NATIVE ? "SOL" : d.token.address}`,
+    `To: ${d.recipient}`,
+    `Credential: ${d.credential}`,
+    `Nonce: ${d.nonce}`,
+    `Valid until: ${new Date(d.deadline).toISOString()}`,
+    `Network: ${NETWORK_LABEL}`,
+  ].join("\n");
 
 /** Parses a user-typed amount; returns null when it isn't a valid positive number for this token. */
 export function parseAmount(input: string, decimals: number): bigint | null {
   const t = input.trim();
   if (!/^\d*\.?\d*$/.test(t) || t === "" || t === ".") return null;
-  const [, frac = ""] = t.split(".");
-  if (frac.length > decimals) return null;
   try {
     const v = parseUnits(t, decimals);
     return v > 0n ? v : null;
@@ -127,10 +111,10 @@ export function parseAmount(input: string, decimals: number): bigint | null {
 const COUNTS_TOWARD_LIMIT = new Set<Authorization["status"]>(["signed", "submitted", "settled", "relayed"]);
 
 /** Amount already authorized for a token in the trailing 24 hours. */
-export function spentToday(data: WalletData, chainId: number, token: Address, now = Date.now()): bigint {
+export function spentToday(data: WalletData, chainId: number, token: string, now = Date.now()): bigint {
   let sum = 0n;
   for (const a of data.authorizations) {
-    if (a.chainId !== chainId || a.token.address.toLowerCase() !== token.toLowerCase()) continue;
+    if (a.chainId !== chainId || a.token.address !== token) continue;
     if (!COUNTS_TOWARD_LIMIT.has(a.status) || now - a.createdAt > 86_400_000) continue;
     sum += BigInt(a.amount);
   }
@@ -145,19 +129,19 @@ export type PolicyIssue = { level: "block" | "warn"; text: string };
  */
 export function checkPolicy(
   data: WalletData,
-  input: { chainId: number; owner: Address; recipient: string; token: PaymentDraft["token"] | null; amount: bigint | null; balance: bigint | null },
+  input: { chainId: number; owner: string; recipient: string; token: PaymentDraft["token"] | null; amount: bigint | null; balance: bigint | null },
 ): PolicyIssue[] {
   const issues: PolicyIssue[] = [];
   if (!data.credential) issues.push({ level: "block", text: "Issue a credential before authorizing payments." });
   else if (data.credential.chainId !== input.chainId)
-    issues.push({ level: "block", text: "Your credential was issued on another network. Switch back or issue one here." });
+    issues.push({ level: "block", text: "Your credential was issued for another network. Issue one for Solana." });
 
   const r = input.recipient.trim();
   if (!r) issues.push({ level: "block", text: "Enter a recipient address." });
-  else if (!isAddress(r)) issues.push({ level: "block", text: "The recipient is not a valid address." });
+  else if (!isSolanaAddress(r)) issues.push({ level: "block", text: "The recipient is not a valid Solana address." });
   else {
-    if (getAddress(r) === getAddress(input.owner)) issues.push({ level: "block", text: "You can't pay your own address." });
-    const known = data.policy.merchants.some((m) => m.address.toLowerCase() === r.toLowerCase());
+    if (r === input.owner) issues.push({ level: "block", text: "You can't pay your own address." });
+    const known = data.policy.merchants.some((m) => m.address === r);
     if (data.policy.allowlistOnly && !known)
       issues.push({ level: "block", text: "Allowlist-only is on and this recipient isn't on your merchant list." });
     else if (!known) issues.push({ level: "warn", text: "This recipient isn't on your merchant list." });
@@ -180,7 +164,7 @@ export function checkPolicy(
   return issues;
 }
 
-export const isNative = (token: Address) => token.toLowerCase() === NATIVE;
+export const isNative = (token: string) => token === NATIVE;
 
 /* ============================================================== relayer */
 
@@ -197,20 +181,21 @@ export async function relayerHealth(): Promise<RelayerHealth> {
 }
 
 /**
- * Hands a signed authorization to the relayer, which pays gas and submits it.
- * Expected response: `{ id: string, txHash?: string }`.
+ * Hands a signed authorization to the relayer, which pays the fee and submits
+ * it. Expected response: `{ id: string, txHash?: string }` (a Solana signature).
  */
-export async function submitToRelayer(a: Authorization): Promise<{ id: string; txHash?: Hex }> {
+export async function submitToRelayer(a: Authorization): Promise<{ id: string; txHash?: string }> {
   const body = {
-    chainId: a.chainId,
+    network: NETWORK_LABEL,
     authorization: {
       credential: a.credential,
       recipient: a.recipient,
-      token: a.token.address,
+      mint: a.token.address,
       amount: a.amount,
       nonce: a.id,
       deadline: Math.floor(a.deadline / 1000),
     },
+    message: a.message,
     signature: a.signature,
   };
   const r = await fetch(`${RELAYER_URL}/v1/authorizations`, {
@@ -221,41 +206,41 @@ export async function submitToRelayer(a: Authorization): Promise<{ id: string; t
   const text = await r.text();
   if (!r.ok) throw new Error(`Relayer rejected the authorization (${r.status}): ${text.slice(0, 200)}`);
   const j = JSON.parse(text) as { id?: string; txHash?: string };
-  return { id: j.id ?? "accepted", txHash: j.txHash as Hex | undefined };
+  return { id: j.id ?? "accepted", txHash: j.txHash };
 }
 
 /* ========================================================== audit reports */
 
 export type AuditReport = {
-  schema: "spectral.audit/1";
-  holder: Address;
-  chainId: number;
-  credential: Hex | null;
+  schema: "spectral.audit/2";
+  holder: string;
+  network: string;
+  credential: string | null;
   period: { from: string; to: string };
   generatedAt: string;
   authorizations: {
-    nonce: Hex;
+    nonce: string;
     createdAt: string;
-    recipient: Address;
+    recipient: string;
     token: string;
-    tokenAddress: Address;
+    mint: string;
     amount: string;
     status: string;
-    txHash: Hex | null;
-    signature: Hex;
+    txHash: string | null;
+    signature: string;
   }[];
   settlements: {
-    txHash: Hex;
+    txHash: string;
     time: string;
     direction: string;
-    counterparty: Address | null;
+    counterparty: string | null;
     token: string | null;
     amount: string;
   }[];
   totals: Record<string, { out: string; in: string }>;
 };
 
-export type SignedAuditFile = { report: AuditReport; digest: Hex; message: string; signature: Hex };
+export type SignedAuditFile = { report: AuditReport; digest: string; message: string; signature: string };
 
 /** Stable key order, so the digest never depends on object insertion order. */
 function canonical(v: unknown): string {
@@ -268,13 +253,13 @@ function canonical(v: unknown): string {
   return JSON.stringify(v);
 }
 
-export const reportDigest = (r: AuditReport): Hex => keccak256(toBytes(canonical(r)));
+export const reportDigest = (r: AuditReport) => hex(sha256(utf8ToBytes(canonical(r))));
 
-export const reportMessage = (r: AuditReport, digest: Hex) =>
+export const reportMessage = (r: AuditReport, digest: string) =>
   [
     "Spectral audit report",
     `Holder: ${r.holder}`,
-    `Chain: ${r.chainId}`,
+    `Network: ${r.network}`,
     `Period: ${r.period.from} to ${r.period.to}`,
     `Entries: ${r.authorizations.length + r.settlements.length}`,
     `Digest: ${digest}`,
@@ -282,14 +267,13 @@ export const reportMessage = (r: AuditReport, digest: Hex) =>
 
 export function buildAuditReport(
   data: WalletData,
-  input: { holder: Address; chainId: number; from: number; to: number; activity: ActivityItem[] },
+  input: { holder: string; chainId: number; from: number; to: number; activity: ActivityItem[] },
 ): AuditReport {
   const inRange = (t: number) => t >= input.from && t <= input.to;
   const totals: AuditReport["totals"] = {};
   const bump = (sym: string, key: "out" | "in", decimals: number, amount: bigint) => {
     const t = (totals[sym] ??= { out: "0", in: "0" });
-    const cur = parseUnits(t[key], decimals);
-    t[key] = formatFixed(cur + amount, decimals);
+    t[key] = formatUnits(parseUnits(t[key], decimals) + amount, decimals);
   };
 
   const authorizations = data.authorizations
@@ -299,8 +283,8 @@ export function buildAuditReport(
       createdAt: new Date(a.createdAt).toISOString(),
       recipient: a.recipient,
       token: a.token.symbol,
-      tokenAddress: a.token.address,
-      amount: formatFixed(BigInt(a.amount), a.token.decimals),
+      mint: a.token.address,
+      amount: formatUnits(BigInt(a.amount), a.token.decimals),
       status: a.status,
       txHash: a.txHash ?? null,
       signature: a.signature,
@@ -316,14 +300,14 @@ export function buildAuditReport(
         direction: i.direction,
         counterparty: i.counterparty,
         token: i.token?.symbol ?? null,
-        amount: formatFixed(i.amount, i.token!.decimals),
+        amount: formatUnits(i.amount, i.token!.decimals),
       };
     });
 
   return {
-    schema: "spectral.audit/1",
+    schema: "spectral.audit/2",
     holder: input.holder,
-    chainId: input.chainId,
+    network: `${chainMeta().name} (${NETWORK_LABEL})`,
     credential: data.credential?.id ?? null,
     period: { from: new Date(input.from).toISOString(), to: new Date(input.to).toISOString() },
     generatedAt: new Date().toISOString(),
@@ -333,37 +317,22 @@ export function buildAuditReport(
   };
 }
 
-/** Plain decimal string for a raw amount, without float rounding. */
-function formatFixed(raw: bigint, decimals: number) {
-  const neg = raw < 0n;
-  const s = (neg ? -raw : raw).toString().padStart(decimals + 1, "0");
-  const int = s.slice(0, s.length - decimals);
-  const frac = decimals ? s.slice(-decimals).replace(/0+$/, "") : "";
-  return `${neg ? "-" : ""}${int}${frac ? `.${frac}` : ""}`;
-}
-
 export type AuditVerification = {
   digestMatches: boolean;
   messageMatches: boolean;
   signatureValid: boolean;
-  holder: Address;
-  chainId: number;
+  holder: string;
+  network: string;
 };
 
-/** Verifies a report file anyone hands you: content hash, message, and signer (EOA or ERC-1271). */
-export async function verifyAuditFile(file: SignedAuditFile): Promise<AuditVerification> {
+/** Verifies a report file anyone hands you: content hash, message, and the holder's ed25519 signature. */
+export function verifyAuditFile(file: SignedAuditFile): AuditVerification {
   const digest = reportDigest(file.report);
-  const digestMatches = digest === file.digest;
-  const messageMatches = reportMessage(file.report, digest) === file.message;
-  let signatureValid = false;
-  try {
-    signatureValid = await publicClient(file.report.chainId).verifyMessage({
-      address: file.report.holder,
-      message: file.message,
-      signature: file.signature,
-    });
-  } catch {
-    signatureValid = false;
-  }
-  return { digestMatches, messageMatches, signatureValid, holder: file.report.holder, chainId: file.report.chainId };
+  return {
+    digestMatches: digest === file.digest,
+    messageMatches: reportMessage(file.report, digest) === file.message,
+    signatureValid: verifySolanaSignature(file.report.holder, file.message, file.signature),
+    holder: file.report.holder,
+    network: file.report.network,
+  };
 }

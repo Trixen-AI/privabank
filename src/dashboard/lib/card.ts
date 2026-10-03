@@ -1,4 +1,5 @@
-import { encodeAbiParameters, keccak256, type Hex } from "viem";
+import { sha256 } from "@noble/hashes/sha2.js";
+import { bytesToHex, utf8ToBytes } from "@noble/hashes/utils.js";
 
 /**
  * The Spectral card attached to a credential.
@@ -32,8 +33,8 @@ function luhnCheckDigit(partial: string) {
 
 export const luhnValid = (n: string) => luhnCheckDigit(n.slice(0, -1)) === n.slice(-1);
 
-export function deriveCard(credentialId: Hex, issuedAt: number): BankCardData {
-  const h = keccak256(encodeAbiParameters([{ type: "bytes32" }, { type: "string" }], [credentialId, "spectral.card.v1"]));
+export function deriveCard(credentialId: string, issuedAt: number): BankCardData {
+  const h = `0x${bytesToHex(sha256(utf8ToBytes(`${credentialId}:spectral.card.v1`)))}`;
   const digits = h
     .slice(2)
     .match(/.{2}/g)!

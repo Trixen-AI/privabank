@@ -1,7 +1,7 @@
 {
   "name": "Spectral",
   "short_name": "Spectral",
-  "description": "The authorization-based onchain neobank.",
+  "description": "The privacy-first, authorization-based onchain neobank on Solana.",
   "start_url": "/app",
   "scope": "/",
   "display": "standalone",

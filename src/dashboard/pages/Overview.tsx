@@ -1,9 +1,8 @@
 import { Link } from "react-router";
 import { useAppKit } from "@reown/appkit/react";
 import { ArrowDownLeft, ArrowUpRight, BadgeCheck, Eye, Send } from "lucide-react";
-import { formatGwei, formatUnits } from "viem";
 import { chainMeta } from "../lib/chains";
-import { fmtAgo, fmtAmount, fmtInt, fmtUsd, shortAddr } from "../lib/format";
+import { fmtAgo, fmtAmount, fmtInt, fmtUsd, formatUnits, shortAddr } from "../lib/format";
 import { spentToday } from "../lib/protocol";
 import { useWalletData, type WalletData } from "../lib/store";
 import { flattenActivity, useActivity, useChainStats, useExposure, usePortfolio, useRelayerHealth, useWallet } from "../hooks/data";
@@ -102,7 +101,7 @@ function UnsupportedNetwork() {
   if (!w.unsupported) return null;
   return (
     <Notice tone="warn" action={<button className="btn btn-sec btn-sm" onClick={() => open({ view: "Networks" })}>Switch network</button>}>
-      Your wallet is on a network Spectral doesn't run on. Showing Robinhood Chain until you switch.
+      Your wallet is on a network Spectral doesn't run on. Switch it to Solana.
     </Notice>
   );
 }
@@ -157,7 +156,6 @@ function BalanceHero({
                 : portfolio && portfolio.unpriced > 0
                   ? ` · ${portfolio.unpriced} without a reliable price`
                   : ""}
-              {portfolio?.source === "rpc" ? " · read from chain logs" : ""}
             </p>
             <ul className="ov-hero-assets">
               {held.slice(0, 4).map((h) => (
@@ -234,15 +232,15 @@ function CredentialCard({ data, chainId }: { data: WalletData; chainId: number }
 function LimitsCard({ data, chainId, holdings }: { data: WalletData; chainId: number; holdings: Holding[] }) {
   // A limit's token comes from current holdings, or from past authorizations if it has since been spent down.
   const known = new Map<string, { symbol: string; decimals: number; address: string }>();
-  for (const a of data.authorizations) known.set(a.token.address.toLowerCase(), a.token);
-  for (const h of holdings) known.set(h.token.toLowerCase(), { symbol: h.symbol, decimals: h.decimals, address: h.token });
+  for (const a of data.authorizations) known.set(a.token.address, a.token);
+  for (const h of holdings) known.set(h.token, { symbol: h.symbol, decimals: h.decimals, address: h.token });
 
   const rows = Object.entries(data.policy.dailyLimits)
     .filter(([k]) => k.startsWith(`${chainId}:`))
     .flatMap(([k, cap]) => {
       const tok = known.get(k.split(":")[1]);
       if (!tok) return [];
-      const used = spentToday(data, chainId, tok.address as `0x${string}`);
+      const used = spentToday(data, chainId, tok.address);
       return [{ ...tok, used, cap }];
     });
 
@@ -279,16 +277,16 @@ function NetworkCard({ chainId }: { chainId: number }) {
     <Card label="Network" title={chain.name}>
       <dl className="kv">
         <div>
-          <dt>Latest block</dt>
-          <dd className="mono">{stats.data ? fmtInt(stats.data.head) : "…"}</dd>
+          <dt>Slot</dt>
+          <dd className="mono">{stats.data ? fmtInt(stats.data.slot) : "…"}</dd>
         </div>
         <div>
-          <dt>Gas price</dt>
-          <dd className="mono">{stats.data ? `${Number(formatGwei(stats.data.gasPrice)).toPrecision(3)} gwei` : "…"}</dd>
+          <dt>Throughput</dt>
+          <dd className="mono">{stats.data?.tps ? `${fmtInt(Math.round(stats.data.tps))} tx/s` : "…"}</dd>
         </div>
         <div>
-          <dt>Block time</dt>
-          <dd className="mono">{stats.data?.blockTime ? `${stats.data.blockTime.toFixed(2)}s` : "…"}</dd>
+          <dt>Slot time</dt>
+          <dd className="mono">{stats.data?.slotTime ? `${(stats.data.slotTime * 1000).toFixed(0)} ms` : "…"}</dd>
         </div>
         <div>
           <dt>Relayer</dt>

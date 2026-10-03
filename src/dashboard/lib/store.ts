@@ -1,5 +1,8 @@
 import { useSyncExternalStore } from "react";
-import type { Address, Hex } from "viem";
+/** Base58 Solana address (a public key or a token mint). Case-sensitive. */
+export type Address = string;
+/** A hex string (credential ids, digests) or a base58 string (signatures, tx ids). */
+export type Hex = string;
 
 /**
  * Everything Spectral keeps on this device, per wallet address.
@@ -10,7 +13,9 @@ import type { Address, Hex } from "viem";
  * schema change can migrate instead of breaking.
  */
 
-export const SCHEMA_VERSION = 1;
+// v2: Solana. Addresses are base58 and case-sensitive, so keys keep their case;
+// nothing from the v1 (EVM) data carries over.
+export const SCHEMA_VERSION = 2;
 
 export type Credential = {
   id: Hex;
@@ -19,7 +24,7 @@ export type Credential = {
   issuedAt: number;
   /** How the wallet was accessed when the credential was issued. */
   method: string;
-  /** false when the wallet signs non-deterministically (smart accounts, some embedded wallets). */
+  /** false when the wallet signs non-deterministically (some embedded or MPC wallets). */
   deterministic: boolean | null;
   /** Name printed on the Spectral card. Older credentials may not have one yet. */
   holderName?: string;
@@ -46,6 +51,8 @@ export type Authorization = {
   deadline: number; // ms
   createdAt: number;
   memo?: string;
+  /** The exact text that was signed (Solana signMessage). */
+  message?: string;
   signature: Hex;
   status: AuthStatus;
   settlement?: "relayer" | "wallet";
@@ -82,7 +89,7 @@ const empty = (): WalletData => ({
   reports: [],
 });
 
-const keyFor = (address: string) => `spectral:v${SCHEMA_VERSION}:${address.toLowerCase()}`;
+const keyFor = (address: string) => `spectral:v${SCHEMA_VERSION}:${address}`;
 
 /* ---- tiny external store with an in-memory cache (localStorage reads are sync and slow) ---- */
 
@@ -184,7 +191,7 @@ export const addReport = (address: string, r: AuditReportRecord) =>
 export const removeReport = (address: string, id: string) =>
   updateWallet(address, (d) => ({ ...d, reports: d.reports.filter((r) => r.id !== id) }));
 
-export const limitKey = (chainId: number, token: Address) => `${chainId}:${token.toLowerCase()}`;
+export const limitKey = (chainId: number, token: Address) => `${chainId}:${token}`;
 
 /** Parses an exported backup, checking it belongs to this schema. */
 export function parseBackup(text: string): WalletData {

@@ -1,54 +1,78 @@
+import { useCallback } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { useAppKitAccount } from "@reown/appkit/react";
-import { useAccount } from "wagmi";
-import type { Address } from "viem";
-import { DEFAULT_CHAIN_ID, isSupportedChain } from "../lib/chains";
-import { publicClient } from "../lib/clients";
+import { useAppKitAccount, useAppKitProvider, useWalletInfo } from "@reown/appkit/react";
+import type { Provider } from "@reown/appkit-adapter-solana/react";
+import bs58 from "bs58";
+import type { Transaction } from "@solana/web3.js";
+import { SOLANA_CHAIN_ID } from "../lib/chains";
 import {
   computeExposure,
   loadActivityPage,
+  loadChainStats,
   loadFootprint,
   loadPortfolio,
   type ActivityCursor,
   type ActivityItem,
 } from "../lib/data";
 import { relayerHealth } from "../lib/protocol";
+import { connection } from "../lib/transfer";
 
 /**
- * The connected wallet as the dashboard sees it. `chainId` falls back to
- * Robinhood Chain when the wallet sits on a network Spectral doesn't support,
- * and `unsupported` tells the UI to offer a switch.
+ * The connected Solana wallet as the dashboard sees it, plus the two things the
+ * app asks a wallet to do: sign a message and send a transaction.
  */
 export function useWallet() {
-  const { address, chainId: walletChain, connector, isConnected, status } = useAccount();
-  const { embeddedWalletInfo } = useAppKitAccount();
-  const unsupported = isConnected && !isSupportedChain(walletChain);
+  const { address, isConnected, status, embeddedWalletInfo } = useAppKitAccount({ namespace: "solana" });
+  const { walletProvider } = useAppKitProvider<Provider>("solana");
+  const { walletInfo } = useWalletInfo("solana");
+
+  /** Signs UTF-8 text; returns the base58 ed25519 signature. */
+  const signMessage = useCallback(
+    async (text: string) => {
+      if (!walletProvider) throw new Error("Connect a wallet first.");
+      const sig = await walletProvider.signMessage(new TextEncoder().encode(text));
+      return bs58.encode(sig);
+    },
+    [walletProvider],
+  );
+
+  /** Has the wallet sign and send a transaction; returns its signature. */
+  const sendTransaction = useCallback(
+    async (tx: Transaction) => {
+      if (!walletProvider) throw new Error("Connect a wallet first.");
+      return walletProvider.sendTransaction(tx, connection());
+    },
+    [walletProvider],
+  );
+
   return {
-    address: address as Address | undefined,
+    address: isConnected ? address : undefined,
     isConnected,
     connecting: status === "connecting" || status === "reconnecting",
-    chainId: unsupported || !walletChain ? DEFAULT_CHAIN_ID : walletChain,
-    walletChain,
-    unsupported,
-    connectorName: connector?.name ?? null,
+    chainId: SOLANA_CHAIN_ID,
+    walletChain: SOLANA_CHAIN_ID,
+    unsupported: false,
+    connectorName: walletInfo?.name ?? null,
     loginMethod: embeddedWalletInfo?.authProvider ?? null,
     loginEmail: (embeddedWalletInfo?.user as { email?: string } | undefined)?.email ?? null,
+    signMessage,
+    sendTransaction,
   };
 }
 
-export function usePortfolio(chainId: number, address: Address | undefined) {
+export function usePortfolio(chainId: number, address: string | undefined) {
   return useQuery({
     queryKey: ["portfolio", chainId, address],
-    queryFn: ({ signal }) => loadPortfolio(chainId, address!, signal),
+    queryFn: () => loadPortfolio(chainId, address!),
     enabled: !!address,
     refetchInterval: 60_000,
   });
 }
 
-export function useActivity(chainId: number, address: Address | undefined) {
+export function useActivity(chainId: number, address: string | undefined) {
   return useInfiniteQuery({
     queryKey: ["activity", chainId, address],
-    queryFn: ({ pageParam, signal }) => loadActivityPage(chainId, address!, pageParam, signal),
+    queryFn: ({ pageParam }) => loadActivityPage(chainId, address!, pageParam),
     initialPageParam: null as ActivityCursor | null,
     getNextPageParam: (last) => last.cursor ?? undefined,
     enabled: !!address,
@@ -58,17 +82,17 @@ export function useActivity(chainId: number, address: Address | undefined) {
 /** Flattened activity across loaded pages. */
 export const flattenActivity = (pages: { items: ActivityItem[] }[] | undefined) => pages?.flatMap((p) => p.items) ?? [];
 
-export function useFootprint(chainId: number, address: Address | undefined) {
+export function useFootprint(chainId: number, address: string | undefined) {
   return useQuery({
     queryKey: ["footprint", chainId, address],
-    queryFn: ({ signal }) => loadFootprint(chainId, address!, signal),
+    queryFn: () => loadFootprint(chainId, address!),
     enabled: !!address,
     staleTime: 5 * 60_000,
   });
 }
 
 /** Exposure = portfolio + footprint + the first page of activity, derived during render. */
-export function useExposure(chainId: number, address: Address | undefined) {
+export function useExposure(chainId: number, address: string | undefined) {
   const portfolio = usePortfolio(chainId, address);
   const footprint = useFootprint(chainId, address);
   const activity = useActivity(chainId, address);
@@ -83,19 +107,9 @@ export function useExposure(chainId: number, address: Address | undefined) {
   };
 }
 
-/** Live chain vitals for the network card: head block, gas price, and block time. */
-export function useChainStats(chainId: number) {
-  return useQuery({
-    queryKey: ["chain-stats", chainId],
-    queryFn: async () => {
-      const c = publicClient(chainId);
-      const [block, gasPrice] = await Promise.all([c.getBlock(), c.getGasPrice()]);
-      const earlier = await c.getBlock({ blockNumber: block.number - 100n > 0n ? block.number - 100n : 0n });
-      const span = Number(block.timestamp - earlier.timestamp);
-      return { head: block.number, gasPrice, blockTime: span > 0 ? span / Number(block.number - earlier.number) : null };
-    },
-    refetchInterval: 15_000,
-  });
+/** Live network vitals: slot, block height, throughput and slot time. */
+export function useChainStats(_chainId?: number) {
+  return useQuery({ queryKey: ["chain-stats"], queryFn: loadChainStats, refetchInterval: 15_000 });
 }
 
 export function useRelayerHealth() {

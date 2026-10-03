@@ -1,4 +1,4 @@
-/** Turns wallet/viem errors into one readable line (user rejections stay short). */
+/** Turns wallet and RPC errors into one readable line (user rejections stay short). */
 export function humanError(e: unknown): string {
   const err = e as { shortMessage?: string; message?: string };
   const msg = err?.shortMessage ?? err?.message ?? String(e);

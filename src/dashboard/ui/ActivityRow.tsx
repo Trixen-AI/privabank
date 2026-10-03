@@ -10,7 +10,7 @@ export function ActivityRow({ item }: { item: ActivityItem }) {
     item.kind === "call" ? <SquareFunction size={16} /> : item.direction === "in" ? <ArrowDownLeft size={16} /> : item.direction === "out" ? <ArrowUpRight size={16} /> : <Repeat size={16} />;
   const title =
     item.kind === "call"
-      ? `Contract call${item.method ? ` · ${item.method}` : ""}`
+      ? (item.method ?? "Program call")
       : item.direction === "in"
         ? "Received"
         : item.direction === "out"
@@ -29,8 +29,10 @@ export function ActivityRow({ item }: { item: ActivityItem }) {
                 {shortAddr(item.counterparty)}
               </a>
             </>
+          ) : item.kind === "call" ? (
+            "program interaction"
           ) : (
-            "contract creation"
+            "no direct counterparty"
           )}
           {" · "}
           {item.timestamp ? fmtAgo(item.timestamp) : "time unknown"}

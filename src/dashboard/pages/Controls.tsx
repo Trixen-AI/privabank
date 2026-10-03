@@ -1,15 +1,12 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useSignMessage, useSwitchChain } from "wagmi";
-import { formatUnits, getAddress, isAddress, keccak256, toBytes } from "viem";
-import { normalize } from "viem/ens";
 import { CheckCircle2, Download, FileCheck2, Plus, Send, ShieldAlert, Trash2, Upload, XCircle } from "lucide-react";
-import { chainMeta } from "../lib/chains";
-import { publicClient } from "../lib/clients";
+import { chainMeta, isSolanaAddress } from "../lib/chains";
+import { resolveSolName } from "../lib/data";
 import { download } from "../lib/download";
 import { humanError } from "../lib/errors";
-import { fmtAmount, fmtDate, fmtDay, shortAddr } from "../lib/format";
+import { fmtAmount, fmtDate, fmtDay, formatUnits, shortAddr } from "../lib/format";
 import {
   buildAuditReport,
   parseAmount,
@@ -66,11 +63,11 @@ function Limits({
   const toast = useToast();
   // Tokens you hold, plus any token that already has a limit (even if spent to zero).
   const rows = useMemo(() => {
-    const m = new Map<string, { address: `0x${string}`; symbol: string; decimals: number; icon: string | null }>();
+    const m = new Map<string, { address: string; symbol: string; decimals: number; icon: string | null }>();
     for (const a of data.authorizations)
-      if (a.chainId === chainId) m.set(a.token.address.toLowerCase(), { ...a.token, icon: null });
+      if (a.chainId === chainId) m.set(a.token.address, { ...a.token, icon: null });
     for (const h of holdings)
-      if (h.raw > 0n) m.set(h.token.toLowerCase(), { address: h.token, symbol: h.symbol, decimals: h.decimals, icon: h.icon });
+      if (h.raw > 0n) m.set(h.token, { address: h.token, symbol: h.symbol, decimals: h.decimals, icon: h.icon });
     return [...m.values()].slice(0, 12);
   }, [holdings, data.authorizations, chainId]);
 
@@ -112,7 +109,7 @@ function LimitRow({
   used,
   onSave,
 }: {
-  token: { address: `0x${string}`; symbol: string; decimals: number; icon: string | null };
+  token: { address: string; symbol: string; decimals: number; icon: string | null };
   cap: string;
   used: bigint;
   onSave: (v: string) => void;
@@ -157,19 +154,19 @@ function Merchants({ data, chainId, address }: { data: WalletData; chainId: numb
   const [input, setInput] = useState("");
   const [label, setLabel] = useState("");
   const [err, setErr] = useState<string | null>(null);
-  const ensName = input.trim().toLowerCase().endsWith(".eth") ? input.trim().toLowerCase() : null;
+  const ensName = input.trim().toLowerCase().endsWith(".sol") ? input.trim().toLowerCase() : null;
   const ens = useQuery({
-    queryKey: ["ens", ensName],
-    queryFn: () => publicClient(1).getEnsAddress({ name: normalize(ensName!) }),
+    queryKey: ["sol-name", ensName],
+    queryFn: () => resolveSolName(ensName!),
     enabled: !!ensName,
   });
-  const resolved = ensName ? ens.data ?? null : isAddress(input.trim()) ? getAddress(input.trim()) : null;
+  const resolved = ensName ? (ens.data ?? null) : isSolanaAddress(input.trim()) ? input.trim() : null;
 
   function add(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
-    if (!resolved) return setErr(ensName ? "That name doesn't resolve." : "Enter a valid address or ENS name.");
-    if (data.policy.merchants.some((m) => m.address.toLowerCase() === resolved.toLowerCase())) return setErr("Already on your list.");
+    if (!resolved) return setErr(ensName ? "That name doesn't resolve." : "Enter a valid Solana address or .sol name.");
+    if (data.policy.merchants.some((m) => m.address === resolved)) return setErr("Already on your list.");
     setPolicy(address, (p) => ({
       ...p,
       merchants: [{ address: resolved, label: label.trim() || ensName || shortAddr(resolved), addedAt: Date.now() }, ...p.merchants],
@@ -201,7 +198,7 @@ function Merchants({ data, chainId, address }: { data: WalletData; chainId: numb
       </p>
 
       <form className="merchant-form" onSubmit={add}>
-        <input className="input mono" placeholder="0x… or name.eth" value={input} onChange={(e) => setInput(e.target.value)} aria-label="Merchant address" />
+        <input className="input mono" placeholder="Solana address or name.sol" value={input} onChange={(e) => setInput(e.target.value)} aria-label="Merchant address" />
         <input className="input" placeholder="Label" value={label} maxLength={40} onChange={(e) => setLabel(e.target.value)} aria-label="Merchant label" />
         <button type="submit" className="btn btn-pri btn-sm" disabled={!input.trim()}>
           <Plus size={15} /> Add
@@ -252,9 +249,7 @@ function Reports({ data, chainId, address }: { data: WalletData; chainId: number
   const [range, setRange] = useState("30");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const activity = useActivity(chainId, address as `0x${string}`);
-  const { signMessageAsync } = useSignMessage();
-  const { switchChainAsync } = useSwitchChain();
+  const activity = useActivity(chainId, address);
   const w = useWallet();
   const toast = useToast();
   const reports = data.reports.filter((r) => r.chainId === chainId);
@@ -277,15 +272,14 @@ function Reports({ data, chainId, address }: { data: WalletData; chainId: number
         hasMore = res.hasNextPage;
       }
 
-      const report = buildAuditReport(data, { holder: getAddress(address), chainId, from, to, activity: flattenActivity(pages) });
+      const report = buildAuditReport(data, { holder: address, chainId, from, to, activity: flattenActivity(pages) });
       const digest = reportDigest(report);
       const message = reportMessage(report, digest);
-      if (w.walletChain !== chainId) await switchChainAsync({ chainId });
-      const signature = await signMessageAsync({ message });
+      const signature = await w.signMessage(message);
       const file: SignedAuditFile = { report, digest, message, signature };
       const text = JSON.stringify(file, null, 2);
       addReport(address, {
-        id: keccak256(toBytes(`${digest}${signature}`)).slice(0, 18),
+        id: `${digest.slice(2, 10)}${signature.slice(0, 8)}`,
         chainId,
         from,
         to,
@@ -368,8 +362,8 @@ function VerifyReport() {
     setBusy(true);
     try {
       const parsed = JSON.parse(await file.text()) as SignedAuditFile;
-      if (parsed?.report?.schema !== "spectral.audit/1" || !parsed.signature) throw new Error("This isn't a Spectral audit report.");
-      const v = await verifyAuditFile(parsed);
+      if (parsed?.report?.schema !== "spectral.audit/2" || !parsed.signature) throw new Error("This isn't a Spectral audit report.");
+      const v = verifyAuditFile(parsed);
       setResult({ ...v, name: file.name, entries: parsed.report.authorizations.length + parsed.report.settlements.length });
     } catch (e) {
       setErr(e instanceof SyntaxError ? "The file isn't valid JSON." : humanError(e));
@@ -382,7 +376,7 @@ function VerifyReport() {
 
   return (
     <Card label="For auditors" title="Verify a report">
-      <p className="muted">Checks that the content is unchanged and that the holder really signed it (wallets and smart accounts).</p>
+      <p className="muted">Checks that the content is unchanged and that the holder's Solana wallet really signed it.</p>
       <label className="file-drop">
         <input type="file" accept="application/json,.json" onChange={(e) => onFile(e.target.files?.[0])} />
         <Upload size={18} />
@@ -399,7 +393,7 @@ function VerifyReport() {
           <ul className="checks">
             <Line ok={result.digestMatches} text="Content matches its digest" />
             <Line ok={result.messageMatches} text="Signed statement matches the content" />
-            <Line ok={result.signatureValid} text={`Signed by ${shortAddr(result.holder)} on ${chainMeta(result.chainId).name}`} />
+            <Line ok={result.signatureValid} text={`Signed by ${shortAddr(result.holder)} on ${result.network}`} />
           </ul>
           <p className="muted small">{result.entries} entries in the report.</p>
         </div>

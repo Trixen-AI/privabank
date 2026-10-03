@@ -116,6 +116,7 @@ export function Footer() {
             </SmartLink>
           ))}
         </nav>
+        <p className="footer-disclaimer">{FOOTER.disclaimer}</p>
       </div>
 
       <div className="footer-wordmark" aria-hidden="true">

@@ -1,43 +1,67 @@
-import { getAddress, type Address } from "viem";
-import { chainMeta, NATIVE } from "./chains";
-import { publicClient } from "./clients";
+import { chainMeta, NATIVE, SOL_DECIMALS, SOLANA_CHAIN_ID } from "./chains";
 import {
-  ExplorerUnavailable,
-  fetchAddressInfo,
-  fetchCounters,
-  fetchTokenBalances,
-  fetchTokenTransfers,
-  fetchTransactions,
-  tokenAddress,
-  type BsTransfer,
-  type BsTx,
-} from "./explorer";
-import { readBalances, readBlockTimes, readTokenMeta, scanTransfersShared } from "./logs";
-import { lower } from "./format";
+  getBalance,
+  getSignatures,
+  getTokenAccounts,
+  getTransaction,
+  rpc,
+  type ParsedInstruction,
+  type ParsedTx,
+  type SignatureInfo,
+} from "./rpc";
 
-/* =========================================================== prices */
+/* =========================================================== token metadata + prices (Jupiter) */
 
-let ethUsdCache: { at: number; value: number | null } | null = null;
+/**
+ * Jupiter's public APIs: token names and icons, and USD prices. Both allow
+ * browser requests. Prices come with liquidity, which is used to ignore tokens
+ * whose quoted value could never actually be sold.
+ */
+const JUP = "https://lite-api.jup.ag";
 
-/** ETH/USD from Ethereum's Blockscout stats (the explorer's own market feed). */
-export async function ethUsd(): Promise<number | null> {
-  if (ethUsdCache && Date.now() - ethUsdCache.at < 5 * 60_000) return ethUsdCache.value;
-  try {
-    const r = await fetch("https://eth.blockscout.com/api/v2/stats", { headers: { accept: "application/json" } });
-    const j = (await r.json()) as { coin_price: string | null };
-    const value = j.coin_price ? Number(j.coin_price) : null;
-    ethUsdCache = { at: Date.now(), value };
-    return value;
-  } catch {
-    return ethUsdCache?.value ?? null;
+type JupToken = { id: string; name: string; symbol: string; icon?: string; decimals: number };
+type JupPrice = { usdPrice: number; liquidity?: number };
+
+const metaCache = new Map<string, JupToken | null>();
+
+async function tokenMeta(mints: string[]): Promise<Map<string, JupToken | null>> {
+  const missing = mints.filter((m) => !metaCache.has(m));
+  // The search endpoint takes up to 100 comma-separated mints per call.
+  for (let i = 0; i < missing.length; i += 100) {
+    const chunk = missing.slice(i, i + 100);
+    try {
+      const r = await fetch(`${JUP}/tokens/v2/search?query=${chunk.join(",")}`);
+      const list = r.ok ? ((await r.json()) as JupToken[]) : [];
+      const byId = new Map(list.map((t) => [t.id, t]));
+      chunk.forEach((m) => metaCache.set(m, byId.get(m) ?? null));
+    } catch {
+      chunk.forEach((m) => metaCache.set(m, null));
+    }
   }
+  return new Map(mints.map((m) => [m, metaCache.get(m) ?? null]));
+}
+
+async function prices(mints: string[]): Promise<Map<string, JupPrice>> {
+  const out = new Map<string, JupPrice>();
+  for (let i = 0; i < mints.length; i += 50) {
+    const chunk = mints.slice(i, i + 50);
+    try {
+      const r = await fetch(`${JUP}/price/v3?ids=${chunk.join(",")}`);
+      if (!r.ok) continue;
+      const j = (await r.json()) as Record<string, JupPrice | null>;
+      for (const [k, v] of Object.entries(j)) if (v?.usdPrice != null) out.set(k, v);
+    } catch {
+      /* prices are optional: holdings still show without them */
+    }
+  }
+  return out;
 }
 
 /* =========================================================== portfolio */
 
 export type Holding = {
-  token: Address; // NATIVE for ETH
-  /** Market value if we had a price but it was not counted (illiquid, see liquidUsd). */
+  token: string; // mint; NATIVE for SOL
+  /** Market value if we had a price but it was not counted (illiquid). */
   illiquidUsd?: number;
   symbol: string;
   name: string;
@@ -54,97 +78,72 @@ export type Portfolio = {
   /** Sum of holdings that have a price. */
   totalUsd: number;
   unpriced: number;
-  source: "explorer" | "rpc";
+  source: "rpc";
 };
 
 const toNum = (raw: bigint, decimals: number) => Number(raw) / 10 ** decimals;
 
 /**
- * Explorer prices are real market rates, but wallets collect unsolicited
- * airdrops whose "value" could never be sold (e.g. a $378k position in a token
- * trading $453 a day). A position is counted only when one day of trading
- * volume could absorb it.
+ * A position is counted in the total only when the token's market could absorb
+ * it: wallets collect unsolicited airdrops whose quoted "value" is unsellable.
  */
-function liquidUsd(amount: number, rate: number | null, volume24h: number | null) {
-  if (rate == null) return { usd: null, illiquid: undefined };
-  const value = amount * rate;
-  if (volume24h != null && volume24h >= value) return { usd: value, illiquid: undefined };
+function liquidUsd(amount: number, p: JupPrice | undefined) {
+  if (!p) return { usd: null, illiquid: undefined };
+  const value = amount * p.usdPrice;
+  if (p.liquidity == null || p.liquidity >= value * 2) return { usd: value, illiquid: undefined };
   return { usd: null, illiquid: value };
 }
 
-export async function loadPortfolio(chainId: number, owner: Address, signal?: AbortSignal): Promise<Portfolio> {
-  const meta = chainMeta(chainId);
-  const client = publicClient(chainId);
+export async function loadPortfolio(_chainId: number, owner: string): Promise<Portfolio> {
+  const meta = chainMeta();
+  const [lamports, accounts] = await Promise.all([getBalance(owner), getTokenAccounts(owner)]);
 
-  // Native balance and price are independent of token discovery: start them now.
-  const nativeP = client.getBalance({ address: owner });
-  const priceP = meta.testnet ? Promise.resolve(null) : ethUsd();
-
-  let tokens: Holding[] = [];
-  let source: Portfolio["source"] = "explorer";
-
-  try {
-    const rows = await fetchTokenBalances(chainId, owner, signal);
-    tokens = rows
-      .filter((r) => r.raw > 0n)
-      .map((r) => {
-        const { usd, illiquid } = liquidUsd(toNum(r.raw, r.decimals), r.usdRate, r.volume24h);
-        return {
-          token: r.address,
-          symbol: r.symbol,
-          name: r.name,
-          decimals: r.decimals,
-          raw: r.raw,
-          usd,
-          illiquidUsd: illiquid,
-          icon: r.icon,
-          native: false,
-        };
-      });
-  } catch (err) {
-    if (!(err instanceof ExplorerUnavailable)) throw err;
-    source = "rpc";
-    // Discover every token the wallet has ever received, then read live balances.
-    const { transfers } = await scanTransfersShared(chainId, owner);
-    const seen = [...new Set(transfers.filter((t) => lower(t.to) === lower(owner)).map((t) => t.token))];
-    const [balances, metas] = await Promise.all([readBalances(chainId, owner, seen), readTokenMeta(chainId, seen)]);
-    tokens = metas
-      .map((m) => ({ ...m, raw: balances.get(m.address) ?? 0n }))
-      .filter((m) => m.raw > 0n)
-      .map((m) => ({ token: m.address, symbol: m.symbol, name: m.name, decimals: m.decimals, raw: m.raw, usd: null, icon: null, native: false }));
+  // Sum per mint (a wallet can hold several accounts for one token).
+  const byMint = new Map<string, { raw: bigint; decimals: number }>();
+  for (const a of accounts) {
+    const info = a.account.data.parsed.info;
+    const raw = BigInt(info.tokenAmount.amount);
+    if (raw === 0n) continue;
+    const cur = byMint.get(info.mint);
+    byMint.set(info.mint, { raw: (cur?.raw ?? 0n) + raw, decimals: info.tokenAmount.decimals });
   }
+  const mints = [...byMint.keys()];
+  const [metas, px] = await Promise.all([tokenMeta(mints), prices([NATIVE, ...mints])]);
 
-  // Well-known tokens are always checked, with a USD peg where it is real.
-  if (meta.knownTokens.length) {
-    const missing = meta.knownTokens.filter((k) => !tokens.some((t) => lower(t.token) === lower(k.address)));
-    const bal = await readBalances(chainId, owner, missing.map((k) => k.address));
-    for (const k of missing) {
-      const raw = bal.get(k.address) ?? 0n;
-      if (raw > 0n) tokens.push({ token: k.address, symbol: k.symbol, name: k.symbol, decimals: k.decimals, raw, usd: null, icon: null, native: false });
-    }
-    for (const t of tokens) {
-      const k = meta.knownTokens.find((x) => lower(x.address) === lower(t.token));
-      if (k?.usdPegged) {
-        t.usd = toNum(t.raw, t.decimals);
-        t.illiquidUsd = undefined;
-      }
-    }
-  }
+  const tokens: Holding[] = mints.map((mint) => {
+    const { raw, decimals } = byMint.get(mint)!;
+    const known = meta.knownTokens.find((k) => k.address === mint);
+    const m = metas.get(mint);
+    const { usd, illiquid } = known?.usdPegged
+      ? { usd: toNum(raw, decimals), illiquid: undefined }
+      : liquidUsd(toNum(raw, decimals), px.get(mint));
+    return {
+      token: mint,
+      symbol: known?.symbol ?? m?.symbol ?? `${mint.slice(0, 4)}…`,
+      name: known?.name ?? m?.name ?? "Unknown token",
+      decimals,
+      raw,
+      usd,
+      illiquidUsd: illiquid,
+      icon: m?.icon ?? null,
+      native: false,
+    };
+  });
 
-  const [nativeRaw, price] = await Promise.all([nativeP, priceP]);
+  const solPrice = px.get(NATIVE)?.usdPrice ?? null;
   const native: Holding = {
     token: NATIVE,
-    symbol: "ETH",
-    name: meta.testnet ? `${meta.short} ETH (test)` : "Ether",
-    decimals: 18,
-    raw: nativeRaw,
-    usd: price != null ? toNum(nativeRaw, 18) * price : null,
+    symbol: "SOL",
+    name: "Solana",
+    decimals: SOL_DECIMALS,
+    raw: lamports,
+    usd: solPrice != null ? toNum(lamports, SOL_DECIMALS) * solPrice : null,
     icon: null,
     native: true,
   };
 
-  // Priced value first; among unpriced assets native ETH leads, so an airdropped
-  // token with an odd symbol never becomes the default choice.
+  // Priced value first; among unpriced assets SOL leads, so an airdropped token
+  // with an odd symbol never becomes the default choice.
   const holdings = [native, ...tokens].sort(
     (a, b) => (b.usd ?? -1) - (a.usd ?? -1) || Number(b.native) - Number(a.native) || a.symbol.localeCompare(b.symbol),
   );
@@ -155,7 +154,7 @@ export async function loadPortfolio(chainId: number, owner: Address, signal?: Ab
     if (h.usd == null) unpriced++;
     else totalUsd += h.usd;
   }
-  return { chainId, holdings, totalUsd, unpriced, source };
+  return { chainId: SOLANA_CHAIN_ID, holdings, totalUsd, unpriced, source: "rpc" };
 }
 
 /* =========================================================== activity */
@@ -163,177 +162,194 @@ export async function loadPortfolio(chainId: number, owner: Address, signal?: Ab
 export type ActivityItem = {
   id: string;
   chainId: number;
-  hash: `0x${string}`;
+  hash: string; // transaction signature
   kind: "native" | "token" | "call";
   direction: "in" | "out" | "self";
-  counterparty: Address | null;
-  token: { address: Address; symbol: string; decimals: number } | null;
+  counterparty: string | null;
+  token: { address: string; symbol: string; decimals: number } | null;
   amount: bigint;
   timestamp: number;
   status: "success" | "failed" | "pending";
   method: string | null;
 };
 
-/**
- * Two explorer feeds (native txs, token transfers) paginate independently, so
- * each page can reach a different depth in time. Items older than the
- * shallower feed's oldest item are held in `buffer` until the next page, which
- * keeps the merged list strictly newest-first across pages.
- */
-export type ActivityCursor = {
-  tx: Record<string, unknown> | null | "done";
-  tt: Record<string, unknown> | null | "done";
-  buffer: ActivityItem[];
-};
+export type ActivityCursor = { before: string };
 
 export type ActivityPage = {
   items: ActivityItem[];
   cursor: ActivityCursor | null;
-  source: "explorer" | "rpc";
-  /** RPC mode: how far back the scan reached, and whether it hit genesis. */
-  coverage?: { fromBlock: bigint; complete: boolean };
+  source: "rpc";
 };
 
-const dir = (owner: Address, from: string, to: string | null): ActivityItem["direction"] => {
-  const o = lower(owner);
-  if (lower(from) === o && to && lower(to) === o) return "self";
-  return lower(from) === o ? "out" : "in";
-};
+const PAGE = 20;
 
-function mapTx(chainId: number, owner: Address, t: BsTx): ActivityItem {
-  const value = BigInt(t.value ?? "0");
-  const d = dir(owner, t.from.hash, t.to?.hash ?? null);
-  const other = d === "out" ? t.to?.hash : t.from.hash;
-  return {
-    id: `tx:${t.hash}`,
-    chainId,
-    hash: t.hash as `0x${string}`,
-    kind: value > 0n ? "native" : "call",
-    direction: d,
-    counterparty: other ? getAddress(other) : null,
-    token: value > 0n ? { address: NATIVE, symbol: "ETH", decimals: 18 } : null,
-    amount: value,
-    timestamp: Date.parse(t.timestamp),
-    status: t.result === "success" || t.status === "ok" ? "success" : t.result === "pending" ? "pending" : "failed",
-    method: t.method,
-  };
+/** The program a transaction mostly talks to, as a readable label for calls. */
+function callLabel(ixs: ParsedInstruction[]) {
+  const named = ixs.find((i) => i.program && !["compute-budget", "spl-memo"].includes(i.program));
+  if (!named) return "Program call";
+  const type = typeof named.parsed === "object" && named.parsed ? named.parsed.type : null;
+  return type ? `${named.program} · ${type}` : (named.program ?? "Program call");
 }
 
-function mapTransfer(chainId: number, owner: Address, t: BsTransfer): ActivityItem {
-  const d = dir(owner, t.from.hash, t.to.hash);
-  const other = d === "out" ? t.to.hash : t.from.hash;
-  const decimals = Number(t.total.decimals ?? t.token.decimals ?? 18);
-  return {
-    id: `tt:${t.transaction_hash}:${t.log_index ?? `${t.from.hash}${t.to.hash}${t.total.value}`}`,
-    chainId,
-    hash: t.transaction_hash as `0x${string}`,
-    kind: "token",
-    direction: d,
-    counterparty: getAddress(other),
-    token: { address: tokenAddress(t.token), symbol: t.token.symbol ?? "?", decimals },
-    amount: BigInt(t.total.value ?? "0"),
-    timestamp: Date.parse(t.timestamp),
-    status: "success",
-    method: null,
-  };
+/** Finds who sent to or received from `owner` in a simple transfer instruction. */
+function transferCounterparty(ixs: ParsedInstruction[], owner: string, ownerAccounts: Set<string>): string | null {
+  for (const ix of ixs) {
+    if (typeof ix.parsed !== "object" || !ix.parsed) continue;
+    const t = ix.parsed.type;
+    const info = ix.parsed.info as Record<string, string>;
+    if (ix.program === "system" && t === "transfer") {
+      if (info.source === owner) return info.destination;
+      if (info.destination === owner) return info.source;
+    }
+    if ((ix.program === "spl-token" || ix.program === "spl-token-2022") && (t === "transfer" || t === "transferChecked")) {
+      const from = info.authority ?? info.multisigAuthority ?? info.source;
+      if (from === owner || ownerAccounts.has(info.source)) return info.destination;
+      if (ownerAccounts.has(info.destination)) return info.authority ?? info.source;
+    }
+  }
+  return null;
 }
 
 /**
- * One page of history. Explorer mode merges native transactions and token
- * transfers (two independently paginated feeds) newest-first; a plain contract
- * call is dropped when a token transfer from the same transaction explains it.
+ * Turns one parsed transaction into what it meant for `owner`: the largest
+ * balance change in SOL or a token, its direction, and the other party when the
+ * transaction is a plain transfer.
  */
-export async function loadActivityPage(
-  chainId: number,
-  owner: Address,
-  cursor: ActivityCursor | null,
-  signal?: AbortSignal,
-): Promise<ActivityPage> {
-  const c: ActivityCursor = cursor ?? { tx: null, tt: null, buffer: [] };
-  try {
-    const [txs, tts] = await Promise.all([
-      c.tx === "done" ? null : fetchTransactions(chainId, owner, c.tx, signal),
-      c.tt === "done" ? null : fetchTokenTransfers(chainId, owner, c.tt, signal),
-    ]);
-    const transfers = (tts?.items ?? []).map((t) => mapTransfer(chainId, owner, t));
-    const txItems = (txs?.items ?? []).map((t) => mapTx(chainId, owner, t));
-    const next = {
-      tx: c.tx === "done" || !txs?.next ? ("done" as const) : txs.next,
-      tt: c.tt === "done" || !tts?.next ? ("done" as const) : tts.next,
-    };
+function toItem(owner: string, sig: SignatureInfo, tx: ParsedTx | null, symbols: Map<string, string>): ActivityItem {
+  const base: ActivityItem = {
+    id: sig.signature,
+    chainId: SOLANA_CHAIN_ID,
+    hash: sig.signature,
+    kind: "call",
+    direction: "out",
+    counterparty: null,
+    token: null,
+    amount: 0n,
+    timestamp: (sig.blockTime ?? tx?.blockTime ?? 0) * 1000,
+    status: sig.err ? "failed" : "success",
+    method: null,
+  };
+  if (!tx?.meta) return base;
 
-    // A feed with more pages only guarantees completeness down to its oldest item.
-    let boundary = -Infinity;
-    const oldest = (xs: ActivityItem[]) => xs.reduce((m, x) => Math.min(m, x.timestamp), Infinity);
-    if (next.tx !== "done" && txItems.length) boundary = Math.max(boundary, oldest(txItems));
-    if (next.tt !== "done" && transfers.length) boundary = Math.max(boundary, oldest(transfers));
+  const keys = tx.transaction.message.accountKeys.map((k) => k.pubkey);
+  const ixs = tx.transaction.message.instructions;
+  const meIdx = keys.indexOf(owner);
+  const signer = tx.transaction.message.accountKeys.find((k) => k.signer)?.pubkey;
 
-    const tokenTxHashes = new Set([...c.buffer, ...transfers].filter((i) => i.kind === "token").map((i) => i.hash));
-    const all = [...c.buffer, ...txItems, ...transfers]
-      .filter((i) => !(i.kind === "call" && tokenTxHashes.has(i.hash)))
-      .sort((x, y) => y.timestamp - x.timestamp);
+  // Token balance changes for accounts owned by `owner`.
+  const ownerAccounts = new Set<string>();
+  const deltas = new Map<string, { delta: bigint; decimals: number }>();
+  const add = (list: typeof tx.meta.preTokenBalances, sign: 1n | -1n) => {
+    for (const b of list ?? []) {
+      if (b.owner !== owner) continue;
+      ownerAccounts.add(keys[b.accountIndex]);
+      const cur = deltas.get(b.mint) ?? { delta: 0n, decimals: b.uiTokenAmount.decimals };
+      cur.delta += sign * BigInt(b.uiTokenAmount.amount);
+      deltas.set(b.mint, cur);
+    }
+  };
+  add(tx.meta.postTokenBalances, 1n);
+  add(tx.meta.preTokenBalances, -1n);
 
-    const items = all.filter((i) => i.timestamp >= boundary);
-    const buffer = all.filter((i) => i.timestamp < boundary);
-    const more = next.tx !== "done" || next.tt !== "done" || buffer.length > 0;
-    return { items, cursor: more ? { ...next, buffer } : null, source: "explorer" };
-  } catch (err) {
-    if (!(err instanceof ExplorerUnavailable)) throw err;
-  }
+  const tokenMove = [...deltas.entries()].filter(([, d]) => d.delta !== 0n).sort((a, b) => (b[1].delta < 0n ? -b[1].delta : b[1].delta) > (a[1].delta < 0n ? -a[1].delta : a[1].delta) ? 1 : -1)[0];
 
-  // RPC fallback: ERC-20 transfers from logs (native ETH transfers leave no log).
-  if (cursor) return { items: [], cursor: null, source: "rpc" };
-  const scan = await scanTransfersShared(chainId, owner);
-  const transfers = scan.transfers.slice(0, 60);
-  const { scannedFrom, complete } = scan;
-  const tokens = [...new Set(transfers.map((t) => t.token))];
-  // Sequential on purpose: running both at once overflows the RPC's batch limit.
-  const metas = await readTokenMeta(chainId, tokens);
-  const times = await readBlockTimes(chainId, transfers.map((t) => t.blockNumber));
-  const metaBy = new Map(metas.map((m) => [lower(m.address), m]));
-  const items: ActivityItem[] = transfers.map((t) => {
-    const d = dir(owner, t.from, t.to);
-    const m = metaBy.get(lower(t.token));
+  // SOL change, ignoring the fee when the owner paid it.
+  let solDelta = meIdx >= 0 ? BigInt(tx.meta.postBalances[meIdx]) - BigInt(tx.meta.preBalances[meIdx]) : 0n;
+  if (signer === owner) solDelta += BigInt(tx.meta.fee);
+
+  const counterparty = transferCounterparty(ixs, owner, ownerAccounts);
+
+  if (tokenMove) {
+    const [mint, d] = tokenMove;
     return {
-      id: `log:${t.txHash}:${t.logIndex}`,
-      chainId,
-      hash: t.txHash,
+      ...base,
       kind: "token",
-      direction: d,
-      counterparty: d === "out" ? t.to : t.from,
-      token: { address: t.token, symbol: m?.symbol ?? "?", decimals: m?.decimals ?? 18 },
-      amount: t.value,
-      timestamp: times.get(t.blockNumber) ?? 0,
-      status: "success",
-      method: null,
+      direction: d.delta > 0n ? "in" : "out",
+      counterparty,
+      token: { address: mint, symbol: symbols.get(mint) ?? `${mint.slice(0, 4)}…`, decimals: d.decimals },
+      amount: d.delta < 0n ? -d.delta : d.delta,
     };
-  });
-  return { items, cursor: null, source: "rpc", coverage: { fromBlock: scannedFrom, complete } };
+  }
+  // Rent and fees alone produce tiny changes; only count a real SOL move.
+  if (solDelta !== 0n && (solDelta > 5000n || solDelta < -5000n)) {
+    return {
+      ...base,
+      kind: "native",
+      direction: solDelta > 0n ? "in" : "out",
+      counterparty,
+      token: { address: NATIVE, symbol: "SOL", decimals: SOL_DECIMALS },
+      amount: solDelta < 0n ? -solDelta : solDelta,
+    };
+  }
+  return { ...base, method: callLabel(ixs) };
+}
+
+export async function loadActivityPage(_chainId: number, owner: string, cursor: ActivityCursor | null): Promise<ActivityPage> {
+  const sigs = await getSignatures(owner, { limit: PAGE, before: cursor?.before });
+  const txs = await Promise.all(sigs.map((s) => getTransaction(s.signature).catch(() => null)));
+
+  // Names for every mint that moved, in one lookup.
+  const mints = new Set<string>();
+  for (const tx of txs) for (const b of [...(tx?.meta?.postTokenBalances ?? []), ...(tx?.meta?.preTokenBalances ?? [])]) mints.add(b.mint);
+  const meta = chainMeta();
+  const metas = await tokenMeta([...mints].filter((m) => !meta.knownTokens.some((k) => k.address === m)));
+  const symbols = new Map<string, string>([...meta.knownTokens.map((k) => [k.address, k.symbol] as [string, string])]);
+  metas.forEach((m, mint) => m && symbols.set(mint, m.symbol));
+
+  const items = sigs.map((s, i) => toItem(owner, s, txs[i], symbols));
+  return {
+    items,
+    cursor: sigs.length === PAGE ? { before: sigs[sigs.length - 1].signature } : null,
+    source: "rpc",
+  };
 }
 
 /* =========================================================== exposure */
 
 export type Footprint = {
-  sentTxCount: number; // nonce: transactions this address has signed
-  explorerTxCount: number | null; // everything the explorer indexes for it
-  ens: string | null;
+  /** Transactions this address appears in, counted up to `txCountCapped`. */
+  txCount: number;
+  txCountCapped: boolean;
+  /** Its .sol name, if it has a favourite one. */
+  name: string | null;
 };
 
-/** Facts only the chain can give: nonce (any chain), ENS (Ethereum), explorer counters where reachable. */
-export async function loadFootprint(chainId: number, owner: Address, signal?: AbortSignal): Promise<Footprint> {
-  const [nonce, ens, counters] = await Promise.all([
-    publicClient(chainId).getTransactionCount({ address: owner }),
-    publicClient(1)
-      .getEnsName({ address: owner })
-      .catch(() => null),
-    fetchCounters(chainId, owner, signal).catch(() => null),
+const COUNT_LIMIT = 1000;
+
+/** Facts the public chain gives away: how much history the address has, and its .sol name. */
+export async function loadFootprint(_chainId: number, owner: string): Promise<Footprint> {
+  const [sigs, name] = await Promise.all([
+    getSignatures(owner, { limit: COUNT_LIMIT }).catch(() => [] as SignatureInfo[]),
+    favoriteSolName(owner),
   ]);
-  let ensName = ens;
-  if (!ensName) ensName = await fetchAddressInfo(chainId, owner, signal).then((a) => a.ens).catch(() => null);
-  return { sentTxCount: nonce, explorerTxCount: counters?.txCount ?? null, ens: ensName };
+  return { txCount: sigs.length, txCountCapped: sigs.length >= COUNT_LIMIT, name };
 }
 
-export type Counterparty = { address: Address; count: number; outCount: number; lastSeen: number };
+/* =========================================================== .sol names (Solana Name Service) */
+
+// SNS's public SDK proxy; it allows browser requests.
+const SNS = "https://sdk-proxy.sns.id";
+
+/** The owner of `name.sol`, or null when the name isn't registered. */
+export async function resolveSolName(name: string): Promise<string | null> {
+  const label = name.trim().toLowerCase().replace(/\.sol$/, "");
+  const r = await fetch(`${SNS}/resolve/${encodeURIComponent(label)}`);
+  const j = (await r.json()) as { s: string; result: string };
+  return j.s === "ok" ? j.result : null;
+}
+
+/** The .sol name an address has chosen to display, if any. */
+export async function favoriteSolName(owner: string): Promise<string | null> {
+  try {
+    const r = await fetch(`${SNS}/favorite-domain/${owner}`);
+    const j = (await r.json()) as { s: string; result?: { reverse?: string } };
+    return j.s === "ok" && j.result?.reverse ? `${j.result.reverse}.sol` : null;
+  } catch {
+    return null;
+  }
+}
+
+export type Counterparty = { address: string; count: number; outCount: number; lastSeen: number };
 
 export type ExposureFinding = { weight: number; max: number; title: string; detail: string };
 
@@ -348,14 +364,14 @@ export type Exposure = {
 
 /**
  * What a stranger can learn from this address on a public ledger, scored 0-100.
- * Computed from real balances, the account nonce, loaded history and ENS.
+ * Computed from real balances, transaction history and the .sol name.
  */
 export function computeExposure(portfolio: Portfolio, footprint: Footprint, activity: ActivityItem[]): Exposure {
   const findings: ExposureFinding[] = [];
 
   // 1. Visible balance
   const held = portfolio.holdings.filter((h) => h.raw > 0n);
-  const balWeight = held.length === 0 ? 0 : portfolio.totalUsd >= 1000 ? 25 : portfolio.totalUsd > 0 || held.length ? 12 : 0;
+  const balWeight = held.length === 0 ? 0 : portfolio.totalUsd >= 1000 ? 25 : 12;
   findings.push({
     weight: balWeight,
     max: 25,
@@ -364,37 +380,36 @@ export function computeExposure(portfolio: Portfolio, footprint: Footprint, acti
       ? `Anyone can read ${held.length} holding${held.length > 1 ? "s" : ""} on this address${
           portfolio.totalUsd > 0 ? `, worth about $${Math.round(portfolio.totalUsd).toLocaleString("en-US")}` : ""
         }.`
-      : "This address holds nothing a block explorer can show.",
+      : "This address holds nothing an explorer can show.",
   });
 
   // 2. Transaction history
-  const n = Math.max(footprint.sentTxCount, footprint.explorerTxCount ?? 0);
+  const n = footprint.txCount;
+  const nLabel = `${footprint.txCountCapped ? "1,000+" : n.toLocaleString("en-US")}`;
   const txWeight = n === 0 ? 0 : n <= 10 ? 8 : n <= 100 ? 15 : 20;
   findings.push({
     weight: txWeight,
     max: 20,
-    title: n ? `${n.toLocaleString("en-US")} transactions on record` : "No transaction history",
+    title: n ? `${nLabel} transactions on record` : "No transaction history",
     detail: n
-      ? `You have signed ${footprint.sentTxCount.toLocaleString("en-US")} transaction${footprint.sentTxCount === 1 ? "" : "s"} from this address. Each one is permanent and timestamped.`
-      : "Nothing has been sent from this address yet.",
+      ? "Every transaction this address took part in is permanent, timestamped and searchable on Solscan."
+      : "This address hasn't appeared in a transaction yet.",
   });
 
   // 3. Counterparty graph
   const cp = new Map<string, Counterparty>();
   for (const a of activity) {
     if (!a.counterparty || a.direction === "self") continue;
-    const k = lower(a.counterparty);
-    const e = cp.get(k) ?? { address: a.counterparty, count: 0, outCount: 0, lastSeen: 0 };
+    const e = cp.get(a.counterparty) ?? { address: a.counterparty, count: 0, outCount: 0, lastSeen: 0 };
     e.count++;
     if (a.direction === "out") e.outCount++;
     e.lastSeen = Math.max(e.lastSeen, a.timestamp);
-    cp.set(k, e);
+    cp.set(a.counterparty, e);
   }
   const counterparties = [...cp.values()].sort((a, b) => b.count - a.count);
   const c = counterparties.length;
-  const cpWeight = c === 0 ? 0 : c <= 5 ? 8 : c <= 20 ? 15 : 20;
   findings.push({
-    weight: cpWeight,
+    weight: c === 0 ? 0 : c <= 5 ? 8 : c <= 20 ? 15 : 20,
     max: 20,
     title: c ? `${c} counterpart${c === 1 ? "y" : "ies"} linked to you` : "No counterparties found",
     detail: c
@@ -404,23 +419,23 @@ export function computeExposure(portfolio: Portfolio, footprint: Footprint, acti
 
   // 4. Identity link
   findings.push({
-    weight: footprint.ens ? 20 : 0,
+    weight: footprint.name ? 20 : 0,
     max: 20,
-    title: footprint.ens ? `Named as ${footprint.ens}` : "No public name attached",
-    detail: footprint.ens
-      ? "An ENS name ties this address, and everything above, to a readable identity."
-      : "No ENS name resolves to this address.",
+    title: footprint.name ? `Named as ${footprint.name}` : "No public name attached",
+    detail: footprint.name
+      ? "A .sol name ties this address, and everything above, to a readable identity."
+      : "No .sol name points at this address.",
   });
 
   // 5. Token footprint
-  const tokensTouched = new Set(activity.filter((a) => a.token && a.kind === "token").map((a) => lower(a.token!.address)));
-  held.forEach((h) => !h.native && tokensTouched.add(lower(h.token)));
+  const tokensTouched = new Set(activity.filter((a) => a.token && a.kind === "token").map((a) => a.token!.address));
+  held.forEach((h) => !h.native && tokensTouched.add(h.token));
   const t = tokensTouched.size;
   findings.push({
     weight: t === 0 ? 0 : t <= 3 ? 5 : 10,
     max: 10,
     title: t ? `${t} token${t === 1 ? "" : "s"} in your footprint` : "No token footprint",
-    detail: t ? "The assets you hold and trade reveal habits, platforms and positions." : "No ERC-20 activity found.",
+    detail: t ? "The assets you hold and trade reveal habits, platforms and positions." : "No SPL token activity found.",
   });
 
   // 6. Longevity
@@ -442,4 +457,18 @@ export function computeExposure(portfolio: Portfolio, footprint: Footprint, acti
   const score = findings.reduce((s, f) => s + f.weight, 0);
   const level = score >= 75 ? "Severe" : score >= 50 ? "High" : score >= 25 ? "Moderate" : "Low";
   return { score, level, findings, counterparties, firstSeen, sample: activity.length };
+}
+
+/* =========================================================== network vitals */
+
+export async function loadChainStats() {
+  const [slot, height, samples] = await Promise.all([
+    rpc<number>("getSlot"),
+    rpc<number>("getBlockHeight"),
+    rpc<{ numTransactions: number; numSlots: number; samplePeriodSecs: number }[]>("getRecentPerformanceSamples", [4]),
+  ]);
+  const tx = samples.reduce((s, x) => s + x.numTransactions, 0);
+  const secs = samples.reduce((s, x) => s + x.samplePeriodSecs, 0);
+  const slots = samples.reduce((s, x) => s + x.numSlots, 0);
+  return { slot, height, tps: secs ? tx / secs : null, slotTime: slots ? secs / slots : null };
 }

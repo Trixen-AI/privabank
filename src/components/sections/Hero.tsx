@@ -1,23 +1,22 @@
 import { HERO, RAILS } from "../../data/site";
 import { SmartLink } from "../ui/SmartLink";
 import { useRotatingWord } from "../../hooks";
-import robinhoodLogo from "../../assets/brands/robinhood.svg";
+import solanaLogo from "../../assets/brands/solana.svg";
 import usdcLogo from "../../assets/brands/usdc.svg";
 import tetherLogo from "../../assets/brands/tether.svg";
 
 /**
  * Third-party marks, official SVG files, used unmodified and only to name the
  * networks and assets Spectral settles on. Sources:
- *   Robinhood https://commons.wikimedia.org/wiki/File:Robinhood_logo.svg
- *             (robinhood.com's press kit was unreachable from the build machine;
- *              swap in the press-kit file if you have it)
+ *   Solana  https://solana.com/branding -> /src/img/branding/solanaLogo.svg
  *   USDC    https://www.circle.com/pressroom (brand kit) -> Lockup/USDC Lockup.svg
  *   Tether  https://tether.to/en/media/ -> /images/logoGreen.svg
- * On the dark site they render as their reversed one-colour (white) variants;
- * see .logo-cell img in components.css.
+ * On the dark site USDC and Tether render as their reversed one-colour (white)
+ * variants; Solana's file is already its dark-background version (gradient mark,
+ * white wordmark) and is shown as is. See .logo-cell img in components.css.
  */
 const RAIL_LOGOS = [
-  { src: robinhoodLogo, alt: "Robinhood", height: 22 },
+  { src: solanaLogo, alt: "Solana", height: 20, asIs: true },
   { src: usdcLogo, alt: "USDC", height: 24 },
   { src: tetherLogo, alt: "Tether", height: 22 },
 ];
@@ -91,7 +90,7 @@ export function Hero() {
               {[0, 1].map((dup) =>
                 RAIL_LOGOS.map((logo) => (
                   <div className="logo-cell" key={`${dup}-${logo.alt}`}>
-                    <img src={logo.src} alt={logo.alt} style={{ height: logo.height }} />
+                    <img src={logo.src} alt={logo.alt} className={"asIs" in logo ? "is-original" : undefined} style={{ height: logo.height }} />
                   </div>
                 )),
               )}

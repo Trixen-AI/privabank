@@ -1,6 +1,20 @@
-import { formatUnits, type Address } from "viem";
+/** Raw integer units to a decimal string, without float rounding. */
+export function formatUnits(raw: bigint, decimals: number) {
+  const neg = raw < 0n;
+  const s = (neg ? -raw : raw).toString().padStart(decimals + 1, "0");
+  const int = s.slice(0, s.length - decimals) || "0";
+  const frac = decimals ? s.slice(-decimals).replace(/0+$/, "") : "";
+  return `${neg ? "-" : ""}${int}${frac ? `.${frac}` : ""}`;
+}
 
-export const shortAddr = (a: string | undefined | null, head = 6, tail = 4) =>
+/** Decimal string to raw integer units; throws on more decimals than the token has. */
+export function parseUnits(value: string, decimals: number) {
+  const [int, frac = ""] = value.trim().split(".");
+  if (frac.length > decimals) throw new Error("Too many decimals");
+  return BigInt((int || "0") + frac.padEnd(decimals, "0"));
+}
+
+export const shortAddr = (a: string | undefined | null, head = 4, tail = 4) =>
   a ? `${a.slice(0, head)}…${a.slice(-tail)}` : "";
 
 /** Human amount with sensible precision: more decimals for small values. */
@@ -37,6 +51,5 @@ export const fmtDate = (ms: number) =>
 export const fmtDay = (ms: number) =>
   new Date(ms).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
-export const sameAddr = (a?: string | null, b?: string | null) => !!a && !!b && a.toLowerCase() === b.toLowerCase();
-
-export const lower = (a: Address | string) => a.toLowerCase();
+/** Solana addresses are case-sensitive: compare exactly. */
+export const sameAddr = (a?: string | null, b?: string | null) => !!a && !!b && a === b;
