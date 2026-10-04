@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { ArrowUpRight, Check, Copy } from "lucide-react";
 import { HERO, RAILS } from "../../data/site";
 import { SmartLink } from "../ui/SmartLink";
 import { useRotatingWord } from "../../hooks";
@@ -20,6 +22,43 @@ const RAIL_LOGOS = [
   { src: usdcLogo, alt: "USDC", height: 24 },
   { src: tetherLogo, alt: "Tether", height: 22 },
 ];
+
+/** The $SPECTRAL contract address, copyable in one tap, with a link to Solscan. */
+function ContractAddress() {
+  const [copied, setCopied] = useState(false);
+  const { ca } = HERO;
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(ca.address);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      // Clipboard blocked: the address is still selectable text.
+    }
+  }
+
+  return (
+    <div className="hero-ca">
+      <span className="hero-ca-k">{ca.label}</span>
+      <code className="hero-ca-v" title={`${ca.address} on ${ca.chain}`}>
+        <span className="hero-ca-full">{ca.address}</span>
+        <span className="hero-ca-short" aria-hidden="true">
+          {ca.address.slice(0, 6)}…{ca.address.slice(-6)}
+        </span>
+      </code>
+      <button type="button" className="hero-ca-btn" onClick={copy} aria-label={copied ? "Contract address copied" : "Copy contract address"}>
+        {copied ? <Check size={15} /> : <Copy size={15} />}
+      </button>
+      <a className="hero-ca-btn" href={ca.explorer} target="_blank" rel="noopener noreferrer" aria-label={`View $SPECTRAL on Solscan`}>
+        <ArrowUpRight size={15} />
+      </a>
+      <span className="hero-ca-live" role="status">
+        {copied ? "Copied" : ""}
+      </span>
+    </div>
+  );
+}
 
 export function Hero() {
   const { word, phase } = useRotatingWord(HERO.labelWords);
@@ -65,6 +104,8 @@ export function Hero() {
                 {HERO.ctaSecondary.label}
               </SmartLink>
             </div>
+
+            <ContractAddress />
 
             <p className="hero-note">
               {HERO.note} <SmartLink href={HERO.noteLink.href}>{HERO.noteLink.label}</SmartLink>

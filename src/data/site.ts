@@ -141,6 +141,13 @@ export const HERO = {
   sub: "The first privacy-first, authorization-based onchain neobank. Users prove permission to spend, not ownership of funds. No public balances. No wallet addresses. Just compliant, private payments.",
   ctaPrimary: { label: "Get credentials", href: "/app/credential" },
   ctaSecondary: { label: "Buy $SPECTRAL", href: "#token" },
+  // $SPECTRAL SPL token mint on Solana.
+  ca: {
+    label: "$SPECTRAL CA",
+    chain: "Solana",
+    address: "7MK1KMamq3edSkNSa9sYhzJcKBJSkDkPa6SXPK3Upump",
+    explorer: "https://solscan.io/token/7MK1KMamq3edSkNSa9sYhzJcKBJSkDkPa6SXPK3Upump",
+  },
   note: "Spectral replaces public wallets with Zero-Knowledge Login credentials. Authenticate without exposing your IP or your identity.",
   noteLink: { label: "Read the whitepaper", href: "#papers" },
   spec: [
